@@ -18,6 +18,11 @@
                 Username or password incorrect !
         </div>
     </c:if>
+    <c:if test="${param.accessDenied != null}">
+        <div class="alert alert-danger" role="alert" id="alert">
+            You Not authorize!
+        </div>
+    </c:if>
     <div class="d-flex justify-content-center h-100">
         <div class="card">
             <div class="card-header">

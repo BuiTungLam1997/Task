@@ -19,22 +19,5 @@ public class HomeController {
     public ModelAndView homePage() {
         ModelAndView mav = new ModelAndView("/admin/home");
         return mav;
-
-    }
-    @RequestMapping(value = {"/dang-nhap"}, method = RequestMethod.GET)
-
-    public ModelAndView Login() {
-        ModelAndView mav = new ModelAndView("login");
-        return mav;
-
-    }
-    @RequestMapping(value = {"/thoat"}, method = RequestMethod.GET)
-    public ModelAndView Logout(HttpServletRequest request, HttpServletResponse response) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            new SecurityContextLogoutHandler().logout(request, response, auth);
-        }
-        return new ModelAndView("redirect:/trang-chu");
-
     }
 }
