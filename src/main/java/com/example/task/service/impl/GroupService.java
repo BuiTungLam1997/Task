@@ -2,10 +2,7 @@ package com.example.task.service.impl;
 
 import com.example.task.dto.GroupDTO;
 import com.example.task.dto.UserGroupDTO;
-import com.example.task.entity.UserEntity;
-import com.example.task.entity.UserGroupEntity;
 import com.example.task.repository.GroupRepository;
-import com.example.task.repository.UserGroupRepository;
 import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
 import org.modelmapper.ModelMapper;

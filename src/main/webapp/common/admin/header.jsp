@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@include file="/common/taglib.jsp" %>
-<%@page import="com.example.task.utils.SecurityUtils" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <head>
@@ -20,7 +19,7 @@
             <ul class="nav ace-nav">
                 <li class="light-blue dropdown-modal">
                 <li class="nav-item">
-                    <a class="nav-link" >Wellcome <%=SecurityUtils.getPrincipal().getFullName()%>></a>
+                    <a class="nav-link" >Wellcome></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href='<c:url value="/thoat"/>'>Thoát</a>

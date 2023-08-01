@@ -1,7 +1,6 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.CommentDTO;
-import com.example.task.entity.CommentEntity;
 import com.example.task.repository.CommentRepository;
 import com.example.task.service.ICommentService;
 import org.modelmapper.ModelMapper;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

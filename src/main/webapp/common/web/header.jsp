@@ -5,7 +5,6 @@
   Time: 10:17 SA
   To change this template use File | Settings | File Templates.
 --%>
-<%@page import="com.example.task.utils.SecurityUtils" %>
 <%@include file="/common/taglib.jsp" %>
 <%@ page language="java" contentType="text/html;charset=UTF-8" %>
 
