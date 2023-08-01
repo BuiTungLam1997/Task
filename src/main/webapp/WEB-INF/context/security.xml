@@ -8,6 +8,7 @@
             http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
     <http auto-config="false" use-expressions="true" disable-url-rewriting="true">
+        <intercept-url pattern="/quan-tri/trang-chu" access="hasAnyRole('ADMIN')" />
         <form-login  login-page="/dang-nhap"
                      username-parameter="j_username"
                      password-parameter="j_password"
