@@ -1,20 +1,24 @@
-package com.example.task.dto;
+package com.example.task.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
 
-
-public class UserDTO extends BaseDTO {
-
+@Entity
+@Table(name = "user")
+public class UserEntity extends BaseEntity {
+    @Column(name = "username")
     private String username;
-
+    @Column(name = "password")
     private String password;
-
+    @Column(name = "fullname")
     private String fullName;
-
-    private String status ;
-
-    private Date createdDate ;
-
+    @Column(name = "status")
+    private String status;
+    @Column(name = "created_date")
+    private Date createdDate;
+    @Column(name = "created_by")
     private String createdBy;
 
     public String getUsername() {

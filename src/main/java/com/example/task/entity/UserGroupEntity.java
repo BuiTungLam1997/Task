@@ -1,12 +1,17 @@
-package com.example.task.dto;
+package com.example.task.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-public class UserGroupDTO extends BaseDTO {
-
+@Entity
+@Table(name = "usergrouppermission")
+public class UserGroupEntity extends BaseEntity {
+    @Column(name = "user_id")
     private Long userId;
-
+    @Column(name = "permission_id")
     private Long permissionId;
-
+    @Column(name = "grouppermission_id")
     private Long groupId;
 
     public Long getUserId() {
