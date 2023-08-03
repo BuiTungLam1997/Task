@@ -52,7 +52,7 @@
             <b class="arrow"></b>
             <ul class="submenu">
                 <li>
-                    <a href='<c:url value="/admin-task-list/?type=list&page=1&maxPageItem=2"/>'>
+                    <a href='<c:url value="/admin-task-list/?page=1&limit=2"/>'>
                         <i class="menu-icon fa fa-caret-right"></i>
                         DS bài viết
                     </a>

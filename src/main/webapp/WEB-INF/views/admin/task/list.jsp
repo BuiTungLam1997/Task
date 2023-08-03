@@ -13,7 +13,7 @@
 </head>
 <body>
 <div class="main-content">
-    <form action="<c:url value="#"/>" id="formSubmit" method="get">
+    <form action="<c:url value="/admin-task-list"/>" id="formSubmit" method="get">
         <div class="main-content-inner">
             <div class="breadcrumbs ace-save-state" id="breadcrumbs">
                 <ul class="breadcrumb">
@@ -57,7 +57,7 @@
                                     <table class="table table-bordered">
                                         <thead>
                                         <tr>
-                                            <%--                                            <th><input type="checkbox" id="checkAll"></th>--%>
+                                            <th><input type="checkbox" id="checkAll"></th>
                                             <th>title</th>
                                             <th>content</th>
                                             <th>performer</th>
@@ -70,7 +70,8 @@
                                         <tbody>
                                         <c:forEach var="item" items="${model.listResult}">
                                             <tr>
-                                                    <%--                                                <td><input type="checkbox" id="checkbox_${item.id}" value="${item.id}"></td>--%>
+                                                <td><input type="checkbox" id="checkbox_${item.id}" value="${item.id}">
+                                                </td>
                                                 <td>${item.title}</td>
                                                 <td>${item.content}</td>
                                                 <td>${item.performer}</td>
@@ -79,7 +80,7 @@
                                                 <td>${item.createdBy}</td>
                                                 <td>
                                                     <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Cập nhật bài viết" href='#'><i
+                                                       title="Cập nhật bài viết" href='/admin-task-edit'><i
                                                             class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                                     </a>
                                                 </td>
@@ -87,9 +88,9 @@
                                         </c:forEach>
                                         </tbody>
                                     </table>
-                                    <%--                                    <ul class="pagination" id="pagination"></ul>--%>
-                                    <%--                                    <input type="hidden" value="" id="page" name="page">--%>
-
+                                    <ul class="pagination" id="pagination"></ul>
+                                    <input type="hidden" value="" id="page" name="page">
+                                    <input type="hidden" value="" id="limit" name="limit">
                                 </div>
                             </div>
                         </div>
@@ -99,8 +100,24 @@
         </div>
     </form>
 </div><!-- /.main-content -->
-
 <script type="text/javascript">
+    var totalPage = ${model.totalPage};
+    var currentPage = ${model.page};
+    var limit = 2
+    $(function () {
+        window.pagObj = $('#pagination').twbsPagination({
+            totalPages: totalPage,
+            visiblePages: limit,
+            startPage: currentPage,
+            onPageClick: function (event, page) {
+                if (currentPage != page) {
+                    $('#limit').val(limit);
+                    $('#page').val(page);
+                    $('#formSubmit').submit();
+                }
+            }
+        });
+    });
 </script>
 </body>
 </html>
