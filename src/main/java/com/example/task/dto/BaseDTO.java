@@ -6,6 +6,29 @@ import java.util.List;
 public class BaseDTO<T> {
     private Long id;
     private List<T> listResult = new ArrayList<>();
+    private int page;
+    private int totalPage;
+    private int limit;
+    private int totalItem;
+    private String message;
+    private Long[] ids;
+    private String searchResponse;
+
+    public String getSearchResponse() {
+        return searchResponse;
+    }
+
+    public void setSearchResponse(String searchResponse) {
+        this.searchResponse = searchResponse;
+    }
+
+    public Long[] getIds() {
+        return ids;
+    }
+
+    public void setIds(Long[] ids) {
+        this.ids = ids;
+    }
 
     public Long getId() {
         return id;
@@ -21,5 +44,45 @@ public class BaseDTO<T> {
 
     public void setListResult(List<T> listResult) {
         this.listResult = listResult;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getTotalPage() {
+        return totalPage;
+    }
+
+    public void setTotalPage(int totalPage) {
+        this.totalPage = totalPage;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public int getTotalItem() {
+        return totalItem;
+    }
+
+    public void setTotalItem(int totalItem) {
+        this.totalItem = totalItem;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

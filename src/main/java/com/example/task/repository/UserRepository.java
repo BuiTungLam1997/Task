@@ -2,7 +2,26 @@ package com.example.task.repository;
 
 import com.example.task.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository extends JpaRepository<UserEntity,Long> {
-    UserEntity findByUsernameAndStatus(String username,String status);
+import java.util.List;
+import java.util.Optional;
+
+
+public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
+    Optional<UserEntity> findByUsernameAndStatus(String username, String status);
+
+    Optional<UserEntity> findByUsername(String username);
+
+    int countByUsernameStartsWith(String username);
+
+    @Query("select username from UserEntity")
+    List<String> findAllUsername();
+
+    @Query(value = "select distinct(gp.code) from user u inner join user_group ug inner join group_permission gp " +
+            " on  u.id = ug.user_id and ug.group_id = gp.id where u.username = ?1"
+            , nativeQuery = true)
+    List<String> findAllPermissionByUsername(String username);
 }
+

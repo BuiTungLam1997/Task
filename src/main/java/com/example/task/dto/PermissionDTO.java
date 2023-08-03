@@ -1,6 +1,6 @@
 package com.example.task.dto;
 
-public class PermissionDTO extends BaseDTO {
+public class PermissionDTO extends BaseDTO<PermissionDTO> {
 
     private String name;
 

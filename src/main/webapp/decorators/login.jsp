@@ -19,6 +19,7 @@
 
     <!--Custom styles-->
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/template/login/style.css">
+    <script type='text/javascript' src="/template/admin/js/jquery-2.2.3.min.js"></script>
 </head>
 <body>
 <div class="container">

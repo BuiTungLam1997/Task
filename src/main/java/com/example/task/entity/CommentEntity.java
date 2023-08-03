@@ -1,21 +1,28 @@
 package com.example.task.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "comment")
+@SuperBuilder
+@NoArgsConstructor
 public class CommentEntity extends BaseEntity{
-    @Column(name = "user_id")
+
     private Long userId;
-    @Column(name = "task_id")
     private Long taskId;
-    @Column(name = "content")
     private String content;
-    @Column(name = "created_date")
+    @CreatedDate
     private Date createdDate;
+
+    @Transient
+    private String fullName;
 
     public Long getUserId() {
         return userId;
@@ -48,4 +55,7 @@ public class CommentEntity extends BaseEntity{
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
+
+
+
 }

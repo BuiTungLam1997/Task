@@ -1,25 +1,45 @@
 package com.example.task.entity;
 
+import lombok.experimental.FieldNameConstants;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
 @Table(name = "user")
+@EntityListeners(AuditingEntityListener.class)
+@FieldNameConstants
 public class UserEntity extends BaseEntity {
-    @Column(name = "username")
+    @Column()
     private String username;
-    @Column(name = "password")
+    @Column()
     private String password;
-    @Column(name = "fullname")
+    @Column(name = "full_name")
     private String fullName;
-    @Column(name = "status")
+    @Column()
     private String status;
     @Column(name = "created_date")
+    @CreatedDate
     private Date createdDate;
     @Column(name = "created_by")
+    @CreatedBy
     private String createdBy;
+    @Column()
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getUsername() {
         return username;
