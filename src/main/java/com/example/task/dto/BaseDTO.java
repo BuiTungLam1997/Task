@@ -10,6 +10,7 @@ public class BaseDTO<T> {
     private int totalPage;
     private int limit;
     private int totalItem;
+    private String message;
 
     public Long getId() {
         return id;
@@ -57,5 +58,13 @@ public class BaseDTO<T> {
 
     public void setTotalItem(int totalItem) {
         this.totalItem = totalItem;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

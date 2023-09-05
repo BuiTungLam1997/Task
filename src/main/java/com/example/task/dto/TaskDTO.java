@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 
-public class TaskDTO extends BaseDTO {
+public class TaskDTO extends BaseDTO<TaskDTO> {
 
     private String title;
 
@@ -48,8 +48,8 @@ public class TaskDTO extends BaseDTO {
         return deadlineEnd;
     }
 
-    public void setDeadlineEnd(Timestamp deadline_End) {
-        this.deadlineEnd = deadline_End;
+    public void setDeadlineEnd(Timestamp deadlineEnd) {
+        this.deadlineEnd = deadlineEnd;
     }
 
     public String getStatus() {

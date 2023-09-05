@@ -39,7 +39,40 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public List<TaskDTO> findAllByUsername(Pageable pageable, String username) {
+        List<TaskDTO> taskDTOS = new ArrayList<>();
+        List<TaskEntity> taskEntities = taskRepository.findAllByPerformer(username);
+        for (TaskEntity item : taskEntities) {
+            taskDTOS.add(mapper.map(item, TaskDTO.class));
+        }
+        return taskDTOS;
+    }
+
+    @Override
     public Integer getTotalItem() {
         return (int) taskRepository.count();
+    }
+
+    @Override
+    public Integer getTotalItemByUsername(String username) {
+        return taskRepository.countByPerformer(username);
+    }
+
+    @Override
+    public TaskDTO findById(Long id) {
+        TaskDTO taskDTO = mapper.map(taskRepository.findById(id), TaskDTO.class);
+        return taskDTO;
+    }
+
+    @Override
+    public TaskDTO save(TaskDTO taskDTO) {
+        TaskEntity taskEntity = mapper.map(taskDTO, TaskEntity.class);
+        return mapper.map(taskRepository.save(taskEntity), TaskDTO.class);
+    }
+
+    @Override
+    public TaskDTO update(TaskDTO taskDTO) {
+        TaskEntity taskEntity = mapper.map(taskDTO, TaskEntity.class);
+        return mapper.map(taskRepository.save(taskEntity), TaskDTO.class);
     }
 }

@@ -52,42 +52,11 @@
             <b class="arrow"></b>
             <ul class="submenu">
                 <li>
-                    <a href='<c:url value="/admin-task-list?page=1&limit=2"/>'>
+                    <a href='<c:url value="/user-task-list?page=1&limit=4"/>'>
                         <i class="menu-icon fa fa-caret-right"></i>
                         Danh sách công việc
                     </a>
                     <b class="arrow"></b>
-                </li>
-                <li>
-                    <a href='<c:url value="/admin-user-list?page=1&limit=4"/>'>
-                        <i class="menu-icon fa fa-caret-right"></i>
-                        Danh sách người dùng
-                    </a>
-                    <b class="arrow"></b>
-                </li>
-                <li>
-                    <a href="#" class="dropdown-toggle">
-                        <i class="menu-icon fa fa-list"></i>
-                        <span class="menu-text"></span>
-                        Danh sách group
-                        <b class="arrow fa fa-angle-down"></b>
-                    </a>
-                    <ul class="submenu">
-                        <li>
-                            <a href='<c:url value="/admin-group-user-list"/>'>
-                                <i class="menu-icon fa fa-caret-right"></i>
-                                Admin User
-                            </a>
-                            <b class="arrow"></b>
-                        </li>
-                        <li>
-                            <a href='<c:url value="/admin-group-task-list"/>'>
-                                <i class="menu-icon fa fa-caret-right"></i>
-                                Admin Task
-                            </a>
-                            <b class="arrow"></b>
-                        </li>
-                    </ul>
                 </li>
             </ul>
         </li>

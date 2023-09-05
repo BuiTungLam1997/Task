@@ -18,12 +18,28 @@ public class UserGroupService implements IUserGroupService {
     ModelMapper mapper = new ModelMapper();
 
     @Override
-    public List<UserGroupDTO> findByUserId(Long userId) {
-        List<UserGroupEntity> userGroupEntities = userGroupRepository.findByUserId(userId);
-        List<UserGroupDTO> userGroupDTOS = new ArrayList<>();
-        for (UserGroupEntity item : userGroupEntities) {
-            userGroupDTOS.add(mapper.map(item, UserGroupDTO.class));
+    public List<Long> findGroupId(Long userId) {
+        return userGroupRepository.findByUserId(userId);
+    }
+
+    @Override
+    public UserGroupDTO save(UserGroupDTO userGroupDTO) {
+        UserGroupEntity userGroupEntity = mapper.map(userGroupDTO, UserGroupEntity.class);
+        return mapper.map(userGroupRepository.save(userGroupEntity), UserGroupDTO.class);
+    }
+
+    @Override
+    public void save(Long groupId, Long[] userId, Long[] permissionId) {
+        UserGroupDTO userGroupDTO = new UserGroupDTO();
+        UserGroupEntity userGroupEntity = new UserGroupEntity();
+        userGroupDTO.setGroupId(groupId);
+        for (int i = 0; i < userId.length; i++) {
+            for (int j = 0; j < permissionId.length; j++) {
+                userGroupDTO.setUserId(userId[i]);
+                userGroupDTO.setPermissionId(permissionId[j]);
+                userGroupEntity = mapper.map(userGroupDTO, UserGroupEntity.class);
+                userGroupDTO = mapper.map(userGroupRepository.save(userGroupEntity), UserGroupDTO.class);
+            }
         }
-        return userGroupDTOS;
     }
 }

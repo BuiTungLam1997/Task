@@ -1,7 +1,6 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.GroupDTO;
-import com.example.task.dto.UserGroupDTO;
 import com.example.task.repository.GroupRepository;
 import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
@@ -28,9 +27,9 @@ public class GroupService implements IGroupService {
     @Override
     public List<GroupDTO> findByUserId(Long userId) {
         List<GroupDTO> listGroup = new ArrayList<>();
-        List<UserGroupDTO> userGroupDTOS = userGroupService.findByUserId(userId);
-        for (UserGroupDTO item : userGroupDTOS) {
-            listGroup.add(mapper.map(groupRepository.findById(item.getGroupId()), GroupDTO.class));
+        List<Long> groupIdS = userGroupService.findGroupId(userId);
+        for (Long item : groupIdS) {
+            listGroup.add(mapper.map(groupRepository.findById(item), GroupDTO.class));
         }
         return listGroup;
     }

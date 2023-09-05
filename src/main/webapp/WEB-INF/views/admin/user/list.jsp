@@ -7,10 +7,10 @@ To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
-<c:url var="APIurl" value="/api-task"/>
-<c:url var="UserURL" value="/admin-task-list">
+<c:url var="APIurl" value="/api-user"/>
+<c:url var="UserURL" value="/admin-user-list">
     <c:param name="page" value="1"></c:param>
-    <c:param name="limit" value="3"></c:param>
+    <c:param name="maxPageItem" value="5"></c:param>
 </c:url>
 <html>
 <head>
@@ -18,7 +18,7 @@ To change this template use File | Settings | File Templates.
 </head>
 <body>
 <div class="main-content">
-    <form action="<c:url value="/admin-task-list"/>" id="formSubmit" method="get">
+    <form action="<c:url value="/admin-user-list"/>" id="formSubmit" method="get">
         <div class="main-content-inner">
             <div class="breadcrumbs ace-save-state" id="breadcrumbs">
                 <ul class="breadcrumb">
@@ -41,7 +41,7 @@ To change this template use File | Settings | File Templates.
                                 <div class="table-responsive">
                                     <div class="pull-right tableTools-container">
                                         <div class="dt-buttons btn-overlap btn-group">
-                                            <c:url var="createUserURL" value="/admin-task-edit"/>
+                                            <c:url var="createUserURL" value="/admin-user-create"/>
                                             <a flag="info"
                                                class="dt-button buttons-colvis btn btn-white btn-primary btn-bold"
                                                data-toggle="tooltip"
@@ -64,12 +64,13 @@ To change this template use File | Settings | File Templates.
                                         <thead>
                                         <tr>
                                             <th><input type="checkbox" id="checkAll"></th>
-                                            <th>title</th>
-                                            <th>content</th>
-                                            <th>performer</th>
-                                            <th>deadlineStart</th>
-                                            <th>deadlineEnd</th>
-                                            <th>createdBy</th>
+                                            <th>Id</th>
+                                            <th>Username</th>
+                                            <th>Password</th>
+                                            <th>Full name</th>
+                                            <th>Status</th>
+                                            <th>Created Date</th>
+                                            <th>created By</th>
                                             <th>Thao tác</th>
                                         </tr>
                                         </thead>
@@ -78,34 +79,20 @@ To change this template use File | Settings | File Templates.
                                             <tr>
                                                 <td><input type="checkbox" id="checkbox_${item.id}" value="${item.id}">
                                                 </td>
-                                                <td>${item.title}</td>
-                                                <td>${item.content}</td>
-                                                <td>${item.performer}</td>
-                                                <td>${item.deadlineStart}</td>
-                                                <td>${item.deadlineEnd}</td>
+                                                <td>${item.id}</td>
+                                                <td>${item.username}</td>
+                                                <td>${item.password}</td>
+                                                <td>${item.fullName}</td>
+                                                <td>${item.status}</td>
+                                                <td>${item.createdDate}</td>
                                                 <td>${item.createdBy}</td>
                                                 <td>
-                                                    <c:url var="updateTaskURL" value="/admin-task-edit">
+                                                    <c:url var="updateUserURL" value="/admin-user-edit">
                                                         <c:param name="id" value="${item.id}"/>
                                                     </c:url>
-                                                    <c:url var="TaskCommentURL" value="/comment">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                    </c:url>
-                                                    <c:url var="giveAJob" value="/admin-task-giveAJob">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                        <c:param name="performer" value="${item.performer}"/>
-                                                    </c:url>
                                                     <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Cập nhật bài viết" href='${updateTaskURL}'>
-                                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Comment" href='${TaskCommentURL}'>
-                                                        <i class="fa fa-fw fa-comment" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Giao công việc" href='${giveAJob}'>
-                                                        <i class="fa fa-fw fa-paper-plane-o" aria-hidden="true"></i>
+                                                       title="Cập nhật bài viết" href='${updateUserURL}'><i
+                                                            class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -127,7 +114,7 @@ To change this template use File | Settings | File Templates.
 <script type="text/javascript">
     var totalPage = ${model.totalPage};
     var currentPage = ${model.page};
-    var limit = 4
+    var limit = 2
     $(function () {
         window.pagObj = $('#pagination').twbsPagination({
             totalPages: totalPage,

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 
-@Controller(value = "homeControllerOfAdmin")
+@Controller
 public class HomeController {
     @RequestMapping(value = {"/admin-home"}, method = RequestMethod.GET)
 

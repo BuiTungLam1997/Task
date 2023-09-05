@@ -21,7 +21,7 @@ public class HomeController {
         return mav;
 
     }
-    @RequestMapping(value = {"/thoat"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/logout"}, method = RequestMethod.GET)
     public ModelAndView Logout() {
         return new ModelAndView("redirect:/trang-chu");
 
@@ -29,7 +29,6 @@ public class HomeController {
     @RequestMapping(value = {"/accessDenied"}, method = RequestMethod.GET)
 
     public ModelAndView accessDenied() {
-        return new ModelAndView("redirect:/dang-nhap");
-
+        return new ModelAndView("redirect:/dang-nhap?accessDenied");
     }
 }

@@ -7,10 +7,10 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
-<c:url var="TaskAPIURL" value="/api-task"/>
-<c:url var="ListURL" value="/admin-task-list">
+<c:url var="UserAPIURL" value="/api-user"/>
+<c:url var="ListURL" value="/admin-user-list">
     <c:param name="page" value="1"></c:param>
-    <c:param name="limit" value="2"></c:param>
+    <c:param name="limit" value="4"></c:param>
 </c:url>
 <html>
 <head>
@@ -59,28 +59,28 @@
                     <!-- PAGE CONTENT BEGINS -->
                     <form:form class="form-horizontal" role="form" id="formSubmit" modelAttribute="model">
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="title"> Title </label>
+                            <label class="col-sm-3 control-label no-padding-right" for="username"> Username </label>
 
                             <div class="col-sm-9">
-                                <form:input path="title" cssClass="col-xs-10 col-sm-5"/>
+                                <form:input path="username" cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
                         <div class="space-4"></div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="content"> Content </label>
+                            <label class="col-sm-3 control-label no-padding-right" for="password"> Password </label>
 
                             <div class="col-sm-9">
-                                <form:input path="content" cssClass="col-xs-10 col-sm-5"/>
+                                <form:input path="password" cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
                         <div class="space-4"></div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="performer"> Performer </label>
+                            <label class="col-sm-3 control-label no-padding-right" for="fullName"> Full Name </label>
 
                             <div class="col-sm-9">
-                                <form:input path="performer" cssClass="col-xs-10 col-sm-5"/>
+                                <form:input path="fullName" cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
                         <div class="space-4"></div>
@@ -94,27 +94,22 @@
                         <div class="space-4"></div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="deadlineStart"> Deadline
-                                Start </label>
-
+                            <label class="col-sm-3 control-label no-padding-right" for="createdBy"> createdBy : </label>
                             <div class="col-sm-9">
-                                <input type="datetime-local" id="deadlineStart" name="deadlineStart"
-                                       path="deadlineStart" value="${model.deadlineStart}"
-                                       cssClass="col-xs-10 col-sm-5"/>
+                                <form:input path="createdBy" cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
+
                         <div class="space-4"></div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="deadlineEnd"> Deadline
-                                End </label>
-
+                            <label class="col-sm-3 control-label no-padding-right" for="createdDate"> Created Date
+                            </label>
                             <div class="col-sm-9">
-                                <input type="datetime-local" id="deadlineEnd" name="deadlineEnd" path="deadlineEnd"
-                                       value="${model.deadlineEnd}" cssClass="col-xs-10 col-sm-5"/>
+                                <input type="datetime-local" id="createdDate" name="createdDate" path="createdDate"
+                                       value="${model.createdDate}" cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
                         <div class="space-4"></div>
-
                         <div class="clearfix form-actions">
                             <div class="col-md-offset-3 col-md-9">
                                 <c:if test="${not empty model.id}">
@@ -162,7 +157,7 @@
 
     function create(data) {
         $.ajax({
-            url: '${TaskAPIURL}',
+            url: '${UserAPIURL}',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(data),
@@ -178,7 +173,7 @@
 
     function update(data) {
         $.ajax({
-            url: '${TaskAPIURL}',
+            url: '${UserAPIURL}',
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(data),

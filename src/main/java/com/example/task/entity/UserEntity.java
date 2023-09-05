@@ -1,12 +1,18 @@
 package com.example.task.entity;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
 @Table(name = "user")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity extends BaseEntity {
     @Column(name = "username")
     private String username;
@@ -17,9 +23,21 @@ public class UserEntity extends BaseEntity {
     @Column(name = "status")
     private String status;
     @Column(name = "created_date")
+    @CreatedDate
     private Date createdDate;
     @Column(name = "created_by")
+    @CreatedBy
     private String createdBy;
+    @Column(name = "email")
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getUsername() {
         return username;

@@ -4,6 +4,7 @@ import com.example.task.Output.ResponseList;
 import com.example.task.dto.TaskDTO;
 import com.example.task.service.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -12,31 +13,23 @@ import java.util.List;
 
 //(value = "manager/api/task")
 @RestController(value = "apiOfTask")
-@RequestMapping
+@RequestMapping(path = "/api-task")
 public class TaskAPI {
     @Autowired
     private ITaskService taskService;
 
-    @GetMapping(value = "/task")
-    public ResponseList<TaskDTO> findAll() {
-        ResponseList result = new ResponseList();
-        result.setStatus("OK");
-        result.setMessage("Find all success");
-        result.setData(taskService.findAll());
-        return result;
-    }
-
-    @PostMapping
+    @PostMapping()
     public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
-        return taskDTO;
+        return taskService.save(taskDTO);
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping()
     public TaskDTO updateTask(@RequestBody TaskDTO taskDTO) {
-        return taskDTO;
+        //luu sang 1 cai db khac de tranh mat du lieu
+        return taskService.save(taskDTO);
     }
 
-    @DeleteMapping
+    @DeleteMapping()
     public void deleteTask(@RequestBody Long[] ids) {
 
     }

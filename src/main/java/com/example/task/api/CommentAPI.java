@@ -2,22 +2,29 @@ package com.example.task.api;
 
 import com.example.task.dto.CommentDTO;
 import com.example.task.service.ICommentService;
+import com.example.task.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "manager/api/comment")
+@RequestMapping(value = "/manager-api-comment")
 public class CommentAPI {
     @Autowired
     private ICommentService commentService;
+    @Autowired
+    private IUserService userService;
+
     @GetMapping
-    public List<CommentDTO> findAll(){
+    public List<CommentDTO> findAll() {
         return commentService.findAll();
     }
+
     @PostMapping
-    public CommentDTO insertComment(@RequestBody CommentDTO commentDTO){
+    public CommentDTO insertComment(@RequestBody CommentDTO commentDTO) {
+        Long userId = userService.findByUsername(commentDTO.getUsername()).get().getId();
+        commentDTO.setUserId(userId);
         return commentService.save(commentDTO);
     }
     @PutMapping(value = "/{id}")

@@ -15,7 +15,7 @@ import static com.example.task.dto.constant.StatusTask.ready;
 
 @Entity
 @Table(name = "task")
-//@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class TaskEntity extends BaseEntity  implements Serializable {
     private static final long serialVersionUID = -7941769011539363185L;
     @Column(name = "title")
@@ -25,14 +25,13 @@ public class TaskEntity extends BaseEntity  implements Serializable {
     @Column(name = "status")
     private String status = String.valueOf(ready);
     @Column(name = "performer")
-    private String performer;
+    private String performer = "admin";
     @Column(name = "deadline_start")
-    //@CreatedDate
     private Timestamp deadlineStart;
     @Column(name = "deadline_end")
     private Timestamp deadlineEnd;
     @Column(name = "created_by")
-    //@CreatedBy
+    @CreatedBy
     private String createdBy;
 
     public String getTitle() {

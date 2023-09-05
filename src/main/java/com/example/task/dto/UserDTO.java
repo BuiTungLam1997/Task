@@ -1,9 +1,11 @@
 package com.example.task.dto;
 
+import com.example.task.dto.constant.StatusUser;
+
 import java.util.Date;
 
 
-public class UserDTO extends BaseDTO {
+public class UserDTO extends BaseDTO<UserDTO> {
 
     private String username;
 
@@ -11,11 +13,20 @@ public class UserDTO extends BaseDTO {
 
     private String fullName;
 
-    private String status ;
+    private String status = String.valueOf(StatusUser.ACTIVE);
 
     private Date createdDate ;
 
     private String createdBy;
+    private String email ;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getUsername() {
         return username;

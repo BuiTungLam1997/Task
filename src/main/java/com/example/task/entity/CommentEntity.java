@@ -1,12 +1,17 @@
 package com.example.task.entity;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
 @Table(name = "comment")
+@EntityListeners(AuditingEntityListener.class)
 public class CommentEntity extends BaseEntity{
     @Column(name = "user_id")
     private Long userId;
@@ -15,6 +20,7 @@ public class CommentEntity extends BaseEntity{
     @Column(name = "content")
     private String content;
     @Column(name = "created_date")
+    @CreatedDate
     private Date createdDate;
 
     public Long getUserId() {
