@@ -15,6 +15,8 @@ public interface IUserService {
     UserDTO findById(Long id);
     UserDTO save(UserDTO userDTO);
     UserDTO update(UserDTO userDTO);
+    UserDTO changePassword(UserDTO userDTO);
+    boolean checkPassword(String oldPassword,String newPassword);
     Boolean isExist(String username);
 
     List<UserDTO> findByAdminUser();

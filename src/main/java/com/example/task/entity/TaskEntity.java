@@ -1,7 +1,7 @@
 package com.example.task.entity;
 
+import com.example.task.dto.constant.Roles;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
@@ -11,7 +11,8 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import static com.example.task.dto.constant.StatusTask.ready;
+import static com.example.task.dto.constant.Roles.*;
+import static com.example.task.dto.constant.StatusTask.*;
 
 @Entity
 @Table(name = "task")
@@ -23,9 +24,9 @@ public class TaskEntity extends BaseEntity  implements Serializable {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
     @Column(name = "status")
-    private String status = String.valueOf(ready);
+    private String status = ready;
     @Column(name = "performer")
-    private String performer = "admin";
+    private String performer = admin;
     @Column(name = "deadline_start")
     private Timestamp deadlineStart;
     @Column(name = "deadline_end")

@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskService implements ITaskService {
@@ -20,32 +20,27 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<TaskDTO> findAll() {
-        List<TaskDTO> taskDTOs = new ArrayList<>();
+
         List<TaskEntity> taskEntities = taskRepository.findAll();
-        for (TaskEntity item : taskEntities) {
-            taskDTOs.add(mapper.map(item, TaskDTO.class));
-        }
-        return taskDTOs;
+        return taskEntities.stream()
+                .map(item -> mapper.map(item, TaskDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<TaskDTO> findAll(Pageable pageable) {
-        List<TaskDTO> taskDTOs = new ArrayList<>();
         List<TaskEntity> taskEntities = taskRepository.findAll(pageable).getContent();
-        for (TaskEntity item : taskEntities) {
-            taskDTOs.add(mapper.map(item, TaskDTO.class));
-        }
-        return taskDTOs;
+        return taskEntities.stream()
+                .map(item -> mapper.map(item, TaskDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<TaskDTO> findAllByUsername(Pageable pageable, String username) {
-        List<TaskDTO> taskDTOS = new ArrayList<>();
         List<TaskEntity> taskEntities = taskRepository.findAllByPerformer(username);
-        for (TaskEntity item : taskEntities) {
-            taskDTOS.add(mapper.map(item, TaskDTO.class));
-        }
-        return taskDTOS;
+        return taskEntities.stream()
+                .map(item -> mapper.map(item, TaskDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,8 +55,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskDTO findById(Long id) {
-        TaskDTO taskDTO = mapper.map(taskRepository.findById(id), TaskDTO.class);
-        return taskDTO;
+        return mapper.map(taskRepository.findById(id), TaskDTO.class);
     }
 
     @Override
@@ -74,5 +68,10 @@ public class TaskService implements ITaskService {
     public TaskDTO update(TaskDTO taskDTO) {
         TaskEntity taskEntity = mapper.map(taskDTO, TaskEntity.class);
         return mapper.map(taskRepository.save(taskEntity), TaskDTO.class);
+    }
+
+    @Override
+    public int getTotalPage(TaskDTO taskDTO) {
+        return (int) Math.ceil((double) (taskDTO.getTotalItem()) / taskDTO.getLimit());
     }
 }

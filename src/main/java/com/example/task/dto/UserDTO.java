@@ -1,8 +1,8 @@
 package com.example.task.dto;
 
-import com.example.task.dto.constant.StatusUser;
-
 import java.util.Date;
+
+import static com.example.task.dto.constant.StatusUser.ACTIVE;
 
 
 public class UserDTO extends BaseDTO<UserDTO> {
@@ -13,12 +13,30 @@ public class UserDTO extends BaseDTO<UserDTO> {
 
     private String fullName;
 
-    private String status = String.valueOf(StatusUser.ACTIVE);
+    private String status = ACTIVE;
 
-    private Date createdDate ;
+    private Date createdDate;
 
     private String createdBy;
-    private String email ;
+    private String email;
+    private String newPassword;
+    private String retypePassword;
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getRetypePassword() {
+        return retypePassword;
+    }
+
+    public void setRetypePassword(String retypePassword) {
+        this.retypePassword = retypePassword;
+    }
 
     public String getEmail() {
         return email;

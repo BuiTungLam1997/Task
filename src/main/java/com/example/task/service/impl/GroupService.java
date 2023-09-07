@@ -8,8 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService implements IGroupService {
@@ -26,11 +26,11 @@ public class GroupService implements IGroupService {
 
     @Override
     public List<GroupDTO> findByUserId(Long userId) {
-        List<GroupDTO> listGroup = new ArrayList<>();
         List<Long> groupIdS = userGroupService.findGroupId(userId);
-        for (Long item : groupIdS) {
-            listGroup.add(mapper.map(groupRepository.findById(item), GroupDTO.class));
-        }
-        return listGroup;
+        return groupIdS.stream()
+                .map(item -> groupRepository.findById(item))
+                .map(item -> mapper.map(item, GroupDTO.class))
+                .collect(Collectors.toList());
+
     }
 }

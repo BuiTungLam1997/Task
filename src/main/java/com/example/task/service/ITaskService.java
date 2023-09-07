@@ -14,4 +14,5 @@ public interface ITaskService {
     TaskDTO findById(Long id);
     TaskDTO save(TaskDTO taskDTO);
     TaskDTO update(TaskDTO taskDTO);
+    int getTotalPage(TaskDTO taskDTO);
 }

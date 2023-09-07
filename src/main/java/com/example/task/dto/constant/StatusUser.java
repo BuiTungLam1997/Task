@@ -1,6 +1,6 @@
 package com.example.task.dto.constant;
 
-public enum StatusUser {
-    ACTIVE,
-    INACTIVE
+public class StatusUser {
+    public static final String ACTIVE = "ACTIVE";
+    public static final String INACTIVE = "INACTIVE";
 }

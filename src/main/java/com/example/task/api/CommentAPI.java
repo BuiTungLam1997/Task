@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/manager-api-comment")
+@RequestMapping(value = "//api/manager/comment")
 public class CommentAPI {
     @Autowired
     private ICommentService commentService;
@@ -23,8 +23,6 @@ public class CommentAPI {
 
     @PostMapping
     public CommentDTO insertComment(@RequestBody CommentDTO commentDTO) {
-        Long userId = userService.findByUsername(commentDTO.getUsername()).get().getId();
-        commentDTO.setUserId(userId);
         return commentService.save(commentDTO);
     }
     @PutMapping(value = "/{id}")

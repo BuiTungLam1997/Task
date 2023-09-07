@@ -10,6 +10,7 @@ import com.example.task.entity.UserEntity;
 import com.example.task.exception.CustomAppException;
 import com.example.task.mail.emailService;
 import com.example.task.repository.GroupRepository;
+import com.example.task.repository.PermissionRepository;
 import com.example.task.repository.UserGroupRepository;
 import com.example.task.repository.UserRepository;
 import com.example.task.service.IGroupService;
@@ -25,9 +26,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+
+import static com.example.task.dto.constant.Roles.LOGIN;
 
 @Service
 public class UserService implements IUserService {
@@ -45,12 +49,14 @@ public class UserService implements IUserService {
     private IUserGroupService userGroupService;
     @Autowired
     private emailService emailService;
+    @Autowired
+    private PermissionRepository permissionRepository;
     ModelMapper mapper = new ModelMapper();
 
 
     @Override
     public List<GrantedAuthority> findByListAuthorities(String username) {
-        Optional<UserEntity> userEntity = userRepository.findByUsernameAndStatus(username, String.valueOf(StatusUser.ACTIVE));
+        Optional<UserEntity> userEntity = userRepository.findByUsernameAndStatus(username, StatusUser.ACTIVE);
         if (userEntity.isPresent()) {
             List<GrantedAuthority> authorities = new ArrayList<>();
             try {
@@ -63,26 +69,25 @@ public class UserService implements IUserService {
                 throw new RuntimeException(ex);
             }
         }
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public List<UserDTO> findAll(Pageable pageable) {
         List<UserEntity> userEntities = userRepository.findAll(pageable).getContent();
-        List<UserDTO> userDTOS = new ArrayList<>();
-        for (UserEntity item : userEntities) {
-            userDTOS.add(mapper.map(item, UserDTO.class));
-        }
-        return userDTOS;
+
+        return userEntities.stream()
+                .map(item -> mapper.map(item, UserDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
     public Optional<UserDTO> findByUsername(String username) {
         Optional<UserEntity> userEntity = userRepository.findByUsername(username);
         if (userEntity.isPresent()) {
-            return Optional.ofNullable(mapper.map(userEntity, UserDTO.class));
+            return userEntity.map(item -> mapper.map(userEntity, UserDTO.class));
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -97,31 +102,34 @@ public class UserService implements IUserService {
 
     @Override
     public UserDTO save(UserDTO userDTO) {
-
-
         userDTO.setUsername(createUsername(userDTO.getFullName()));
         userDTO.setEmail(createEmail(userDTO.getUsername()));
 
-        String password = String.valueOf(randomPassword());
 
         UserEntity user = mapper.map(userDTO, UserEntity.class);
 
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userDTO = mapper.map(userRepository.save(user), UserDTO.class);
-
 
         addGroup(userDTO);
 
-        userDTO.setPassword(password);
         return userDTO;
     }
 
     private void addGroup(UserDTO userDTO) {
         UserGroupDTO userGroupDTO = new UserGroupDTO();
         userGroupDTO.setUserId(userDTO.getId());
-        userGroupDTO.setGroupId(1L);
-        userGroupDTO.setPermissionId(1L);
+        userGroupDTO.setGroupId(getGroupIdByRole(LOGIN));
+        userGroupDTO.setPermissionId(getPermissionIdByRole(LOGIN));
         userGroupService.save(userGroupDTO);
+    }
+
+    private Long getGroupIdByRole(String role) {
+        return groupRepository.findByCode(role).get().getId();
+    }
+
+    private Long getPermissionIdByRole(String role) {
+        return permissionRepository.findByCode(role).get().getId();
     }
 
     @Override
@@ -132,6 +140,19 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public UserDTO changePassword(UserDTO userDTO) {
+        Optional<UserEntity> user = userRepository.findByUsername(userDTO.getUsername());
+        user.get().setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
+        UserEntity userEntity = mapper.map(user, UserEntity.class);
+        return mapper.map(userRepository.save(userEntity), UserDTO.class);
+    }
+
+    @Override
+    public boolean checkPassword(String oldPassword, String newPassword) {
+        return oldPassword.equals(newPassword);
+    }
+
+    @Override
     public Boolean isExist(String username) {
         Optional<UserEntity> user = userRepository.findByUsername(username);
         return user.isPresent();
@@ -139,18 +160,14 @@ public class UserService implements IUserService {
 
     @Override
     public List<UserDTO> findByAdminUser() {
-        String role = String.valueOf(CodePermission.ADMIN_USER);
-        List<UserDTO> user = new ArrayList<>();
-        user = findByRole(role, user);
-        return user;
+        String role = CodePermission.ADMIN_USER;
+        return findByRole(role);
     }
 
     @Override
     public List<UserDTO> findByAdminTask() {
-        List<UserDTO> user = new ArrayList<>();
-        String role = String.valueOf(CodePermission.ADMIN_TASK);
-        user = findByRole(role, user);
-        return user;
+        String role = CodePermission.ADMIN_TASK;
+        return findByRole(role);
     }
 
     @Override
@@ -158,30 +175,18 @@ public class UserService implements IUserService {
         emailService.sendMail(to, title, content);
     }
 
-    private List<UserDTO> findByRole(String role, List<UserDTO> user) {
-
-        Optional<GroupEntity> group;
-        Optional<UserEntity> userEntity;
-        group = groupRepository.findByCode(role);
-
+    private List<UserDTO> findByRole(String role) {
+        Optional<GroupEntity> group = groupRepository.findByCode(role);
         List<Long> userGroupEntities = userGroupRepository.findByGroupId(group.get().getId());
+
         if (userGroupEntities.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
-        for (Long item : userGroupEntities) {
-            userEntity = userRepository.findById(item);
-            user.add(mapper.map(userEntity, UserDTO.class));
-        }
-        return user;
-    }
 
-
-    private boolean isUnique(String username) {
-        Optional<UserEntity> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            return true;
-        }
-        return false;
+        return userGroupEntities.stream()
+                .map(item -> userRepository.findById(item))
+                .map(item -> mapper.map(item, UserDTO.class))
+                .collect(Collectors.toList());
     }
 
     private String createUsername(String fullName) {
@@ -189,27 +194,16 @@ public class UserService implements IUserService {
         String firstUser = "";
         String lastUser = "";
         String[] split = fullName.split("\\s");
+
         lastUser = StringUtils.removeAccent(split[0]);
         firstUser = StringUtils.removeAccent(split[split.length - 1]);
         username.append(firstUser).append(".").append(lastUser);
-        String userCheck = username.toString();
-        int i = 1;
-        boolean isEmpty = true;
-        while (isUnique(userCheck.toString().toLowerCase())) {
-            isEmpty = false;
-            userCheck = username.toString();
-            String lastNumber = String.valueOf(i);
-            userCheck += lastNumber;
-            i++;
-        }
-        if (isEmpty) {
-            return username.toString().toLowerCase();
-        }
-        return username.append(i - 1).toString().toLowerCase();
-    }
 
-    private int randomPassword() {
-        return ThreadLocalRandom.current().nextInt(111111, 999999);
+        int lastNumberUser = userRepository.lastNumberUser(username.toString().toLowerCase());
+        if (lastNumberUser != 0) {
+            username.append(lastNumberUser);
+        }
+        return username.toString().toLowerCase();
     }
 
     private String createEmail(String username) {

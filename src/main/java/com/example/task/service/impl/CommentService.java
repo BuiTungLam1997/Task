@@ -5,6 +5,7 @@ import com.example.task.entity.CommentEntity;
 import com.example.task.repository.CommentRepository;
 import com.example.task.repository.UserRepository;
 import com.example.task.service.ICommentService;
+import com.example.task.service.IUserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,8 @@ public class CommentService implements ICommentService {
     private CommentRepository commentRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private IUserService userService;
 
     @Override
     public List<CommentDTO> findAll() {
@@ -33,6 +36,8 @@ public class CommentService implements ICommentService {
 
     @Override
     public CommentDTO save(CommentDTO commentDTO) {
+        Long userId = userService.findByUsername(commentDTO.getUsername()).get().getId();
+        commentDTO.setUserId(userId);
         CommentEntity commentEntity = mapper.map(commentDTO, CommentEntity.class);
         return mapper.map(commentRepository.save(commentEntity), CommentDTO.class);
     }
