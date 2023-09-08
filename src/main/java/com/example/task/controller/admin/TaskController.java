@@ -34,21 +34,19 @@ public class TaskController {
                                  @RequestParam("page") int page,
                                  @RequestParam("limit") int limit,
                                  @RequestParam(value = "message", required = false) String message) {
-        ModelAndView mav = new ModelAndView("/admin/task/list");
-
         Pageable pageable = PageRequest.of(page - 1, limit);
         taskSetter(taskDTO, page, limit, pageable);
 
+        ModelAndView mav = new ModelAndView("/admin/task/list");
         mav.addObject("model", taskDTO);
 
         if (message != null) {
             Map<String, String> result = messageUtils.getMessage(message);
-            mav.addObject("messageResponse", result.get("message"));
+            mav.addObject("message", result.get("message"));
             mav.addObject("alert", result.get("alert"));
         }
         return mav;
     }
-
 
     private void taskSetter(TaskDTO taskDTO, int page, int limit, Pageable pageable) {
         taskDTO.setPage(page);
@@ -60,17 +58,17 @@ public class TaskController {
 
     @GetMapping(value = "/admin-task-edit")
     public ModelAndView newsEdit(@RequestParam(value = "id", required = false) Long id) {
-        ModelAndView mav = new ModelAndView("/admin/task/edit");
         TaskDTO taskDTO = new TaskDTO();
         taskDTO = (id != null) ? taskService.findById(id) : taskDTO;
+        ModelAndView mav = new ModelAndView("/admin/task/edit");
         mav.addObject("model", taskDTO);
         return mav;
     }
 
     @GetMapping(value = "/admin-task-giveAJob")
     public ModelAndView giveAJob(@RequestParam(value = "id", required = false) Long id) {
-        ModelAndView mav = new ModelAndView("/admin/task/giveAJob");
         TaskDTO taskDTO = taskService.findById(id);
+        ModelAndView mav = new ModelAndView("/admin/task/giveAJob");
         mav.addObject("model", taskDTO);
         return mav;
     }
@@ -125,7 +123,7 @@ public class TaskController {
         if (userDTO.isPresent()) {
             String to = userDTO.get().getEmail();
             if (to == null) {
-                to = "admin@gmail.com";
+                to = userService.getMailDefault();
             }
             String title = taskDTO.getTitle();
             String content = taskDTO.getContent();

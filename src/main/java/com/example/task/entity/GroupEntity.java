@@ -7,11 +7,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "grouppermission")
 public class GroupEntity extends BaseEntity{
-    @Column(name = "name")
+    @Column()
     private String name;
-    @Column(name = "code")
+    @Column()
     private String code;
-    @Column(name = "note")
+    @Column()
     private String note;
 
     public String getName() {

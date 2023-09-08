@@ -8,11 +8,9 @@ import java.util.List;
 
 public interface UserGroupRepository extends JpaRepository<UserGroupEntity,Long> {
 
-    @Query(value = "SELECT DISTINCT(GROUP_ID) FROM USERGROUP u WHERE u.USER_ID = ?1",
-            nativeQuery = true)
+    @Query(value = "SELECT DISTINCT u.groupId FROM UserGroupEntity u WHERE u.userId = ?1")
     List<Long> findByUserId(Long userId);
 
-    @Query(value = "SELECT DISTINCT(USER_ID) FROM USERGROUP u WHERE u.GROUP_ID = ?1",
-            nativeQuery = true)
+    @Query(value = "SELECT DISTINCT u.userId FROM UserGroupEntity u WHERE u.groupId = ?1")
     List<Long> findByGroupId(Long groupId);
 }

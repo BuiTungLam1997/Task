@@ -2,21 +2,20 @@ package com.example.task.service.impl;
 
 import com.example.task.dto.CommentDTO;
 import com.example.task.entity.CommentEntity;
+import com.example.task.entity.TaskEntity;
 import com.example.task.repository.CommentRepository;
 import com.example.task.repository.UserRepository;
 import com.example.task.service.ICommentService;
 import com.example.task.service.IUserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class CommentService implements ICommentService {
-    ModelMapper mapper = new ModelMapper();
+public class CommentService extends BaseService implements ICommentService {
     @Autowired
     private CommentRepository commentRepository;
     @Autowired
@@ -36,10 +35,8 @@ public class CommentService implements ICommentService {
 
     @Override
     public CommentDTO save(CommentDTO commentDTO) {
-        Long userId = userService.findByUsername(commentDTO.getUsername()).get().getId();
-        commentDTO.setUserId(userId);
-        CommentEntity commentEntity = mapper.map(commentDTO, CommentEntity.class);
-        return mapper.map(commentRepository.save(commentEntity), CommentDTO.class);
+        CommentEntity commentEntity = modelMapper.map(commentDTO, CommentEntity.class);
+        return modelMapper.map(commentRepository.save(commentEntity), CommentDTO.class);
     }
 
     @Override
@@ -57,13 +54,9 @@ public class CommentService implements ICommentService {
     @Override
     public List<CommentDTO> findByTaskId(Long taskId) {
         List<CommentEntity> commentEntity = commentRepository.findByTaskId(taskId);
-        List<CommentDTO> commentDTOS = new ArrayList<>();
-        if (commentEntity.size() != 0) {
-            for (CommentEntity item : commentEntity) {
-                commentDTOS.add(mapper.map(item, CommentDTO.class));
-            }
-        }
-        return commentDTOS;
+        return commentEntity.stream()
+                .map(item -> modelMapper.map(item, CommentDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -73,14 +66,10 @@ public class CommentService implements ICommentService {
 
     @Override
     public List<CommentDTO> setListResult(Long taskId) {
-        List<CommentDTO> commentDTOS = new ArrayList<>();
         List<CommentEntity> commentEntities = commentRepository.findByTaskId(taskId);
-        for (CommentEntity item : commentEntities) {
-            commentDTOS.add(mapper.map(item, CommentDTO.class));
-        }
-        for (CommentDTO item : commentDTOS) {
-            item.setFullName(userRepository.findById(item.getUserId()).get().getFullName());
-        }
-        return commentDTOS;
+        return commentEntities.stream()
+                .map(item -> modelMapper.map(item, CommentDTO.class))
+                .peek(item -> item.setFullName(userRepository.findById(item.getUserId()).get().getFullName()))
+                .collect(Collectors.toList());
     }
 }

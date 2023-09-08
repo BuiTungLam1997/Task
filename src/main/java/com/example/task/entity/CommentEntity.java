@@ -17,7 +17,7 @@ public class CommentEntity extends BaseEntity{
     private Long userId;
     @Column(name = "task_id")
     private Long taskId;
-    @Column(name = "content")
+    @Column()
     private String content;
     @Column(name = "created_date")
     @CreatedDate

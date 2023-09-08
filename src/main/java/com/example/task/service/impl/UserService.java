@@ -17,7 +17,6 @@ import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
 import com.example.task.service.IUserService;
 import com.example.task.utils.StringUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,9 +31,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.task.dto.constant.Roles.LOGIN;
+import static com.example.task.dto.constant.Roles.admin;
 
 @Service
-public class UserService implements IUserService {
+public class UserService extends BaseService implements IUserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -51,12 +51,11 @@ public class UserService implements IUserService {
     private emailService emailService;
     @Autowired
     private PermissionRepository permissionRepository;
-    ModelMapper mapper = new ModelMapper();
 
 
     @Override
     public List<GrantedAuthority> findByListAuthorities(String username) {
-        Optional<UserEntity> userEntity = userRepository.findByUsernameAndStatus(username, StatusUser.ACTIVE);
+        Optional<UserEntity> userEntity = userRepository.findByUsernameAndStatus(username, String.valueOf(StatusUser.ACTIVE));
         if (userEntity.isPresent()) {
             List<GrantedAuthority> authorities = new ArrayList<>();
             try {
@@ -77,7 +76,7 @@ public class UserService implements IUserService {
         List<UserEntity> userEntities = userRepository.findAll(pageable).getContent();
 
         return userEntities.stream()
-                .map(item -> mapper.map(item, UserDTO.class))
+                .map(item -> modelMapper.map(item, UserDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -85,7 +84,7 @@ public class UserService implements IUserService {
     public Optional<UserDTO> findByUsername(String username) {
         Optional<UserEntity> userEntity = userRepository.findByUsername(username);
         if (userEntity.isPresent()) {
-            return userEntity.map(item -> mapper.map(userEntity, UserDTO.class));
+            return userEntity.map(item -> modelMapper.map(userEntity, UserDTO.class));
         }
         return Optional.empty();
     }
@@ -97,7 +96,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserDTO findById(Long id) {
-        return mapper.map(userRepository.findById(id), UserDTO.class);
+        return modelMapper.map(userRepository.findById(id), UserDTO.class);
     }
 
     @Override
@@ -106,10 +105,10 @@ public class UserService implements IUserService {
         userDTO.setEmail(createEmail(userDTO.getUsername()));
 
 
-        UserEntity user = mapper.map(userDTO, UserEntity.class);
+        UserEntity user = modelMapper.map(userDTO, UserEntity.class);
 
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        userDTO = mapper.map(userRepository.save(user), UserDTO.class);
+        userDTO = modelMapper.map(userRepository.save(user), UserDTO.class);
 
         addGroup(userDTO);
 
@@ -119,8 +118,8 @@ public class UserService implements IUserService {
     private void addGroup(UserDTO userDTO) {
         UserGroupDTO userGroupDTO = new UserGroupDTO();
         userGroupDTO.setUserId(userDTO.getId());
-        userGroupDTO.setGroupId(getGroupIdByRole(LOGIN));
-        userGroupDTO.setPermissionId(getPermissionIdByRole(LOGIN));
+        userGroupDTO.setGroupId(getGroupIdByRole(String.valueOf(LOGIN)));
+        userGroupDTO.setPermissionId(getPermissionIdByRole(String.valueOf(LOGIN)));
         userGroupService.save(userGroupDTO);
     }
 
@@ -134,17 +133,23 @@ public class UserService implements IUserService {
 
     @Override
     public UserDTO update(UserDTO userDTO) {
-        UserEntity user = mapper.map(userDTO, UserEntity.class);
+        UserEntity user = modelMapper.map(userDTO, UserEntity.class);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        return mapper.map(userRepository.save(user), UserDTO.class);
+        return modelMapper.map(userRepository.save(user), UserDTO.class);
     }
 
     @Override
     public UserDTO changePassword(UserDTO userDTO) {
         Optional<UserEntity> user = userRepository.findByUsername(userDTO.getUsername());
-        user.get().setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
-        UserEntity userEntity = mapper.map(user, UserEntity.class);
-        return mapper.map(userRepository.save(userEntity), UserDTO.class);
+        if (!user.isPresent()) {
+            throw new RuntimeException();
+        }
+        UserEntity userEntity = user.get();
+        if (passwordEncoder.matches(userDTO.getNewPassword(), userEntity.getPassword())) {
+            throw new RuntimeException();
+        }
+        userEntity.setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
+        return modelMapper.map(userRepository.save(userEntity), UserDTO.class);
     }
 
     @Override
@@ -160,19 +165,24 @@ public class UserService implements IUserService {
 
     @Override
     public List<UserDTO> findByAdminUser() {
-        String role = CodePermission.ADMIN_USER;
+        String role = String.valueOf(CodePermission.ADMIN_USER);
         return findByRole(role);
     }
 
     @Override
     public List<UserDTO> findByAdminTask() {
-        String role = CodePermission.ADMIN_TASK;
+        String role = String.valueOf(CodePermission.ADMIN_TASK);
         return findByRole(role);
     }
 
     @Override
     public void sendMail(String to, String title, String content) {
         emailService.sendMail(to, title, content);
+    }
+
+    @Override
+    public String getMailDefault() {
+        return userRepository.findByUsername(String.valueOf(admin)).get().getEmail();
     }
 
     private List<UserDTO> findByRole(String role) {
@@ -185,7 +195,7 @@ public class UserService implements IUserService {
 
         return userGroupEntities.stream()
                 .map(item -> userRepository.findById(item))
-                .map(item -> mapper.map(item, UserDTO.class))
+                .map(item -> modelMapper.map(item, UserDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -199,7 +209,7 @@ public class UserService implements IUserService {
         firstUser = StringUtils.removeAccent(split[split.length - 1]);
         username.append(firstUser).append(".").append(lastUser);
 
-        int lastNumberUser = userRepository.lastNumberUser(username.toString().toLowerCase());
+        int lastNumberUser = userRepository.countByUsernameStartsWith(username.toString().toLowerCase());
         if (lastNumberUser != 0) {
             username.append(lastNumberUser);
         }
@@ -216,6 +226,6 @@ public class UserService implements IUserService {
         if (!user.isPresent()) {
             throw new CustomAppException(404, "User not found");
         }
-        return mapper.map(user, UserDTO.class);
+        return modelMapper.map(user, UserDTO.class);
     }
 }

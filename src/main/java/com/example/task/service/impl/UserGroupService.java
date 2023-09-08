@@ -4,17 +4,16 @@ import com.example.task.dto.UserGroupDTO;
 import com.example.task.entity.UserGroupEntity;
 import com.example.task.repository.UserGroupRepository;
 import com.example.task.service.IUserGroupService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UserGroupService implements IUserGroupService {
+public class UserGroupService extends BaseService implements IUserGroupService {
     @Autowired
     private UserGroupRepository userGroupRepository;
-    ModelMapper mapper = new ModelMapper();
+
 
     @Override
     public List<Long> findGroupId(Long userId) {
@@ -23,8 +22,8 @@ public class UserGroupService implements IUserGroupService {
 
     @Override
     public UserGroupDTO save(UserGroupDTO userGroupDTO) {
-        UserGroupEntity userGroupEntity = mapper.map(userGroupDTO, UserGroupEntity.class);
-        return mapper.map(userGroupRepository.save(userGroupEntity), UserGroupDTO.class);
+        UserGroupEntity userGroupEntity = modelMapper.map(userGroupDTO, UserGroupEntity.class);
+        return modelMapper.map(userGroupRepository.save(userGroupEntity), UserGroupDTO.class);
     }
 
     @Override
@@ -36,8 +35,8 @@ public class UserGroupService implements IUserGroupService {
             for (int j = 0; j < permissionId.length; j++) {
                 userGroupDTO.setUserId(userId[i]);
                 userGroupDTO.setPermissionId(permissionId[j]);
-                userGroupEntity = mapper.map(userGroupDTO, UserGroupEntity.class);
-                userGroupDTO = mapper.map(userGroupRepository.save(userGroupEntity), UserGroupDTO.class);
+                userGroupEntity = modelMapper.map(userGroupDTO, UserGroupEntity.class);
+                userGroupDTO = modelMapper.map(userGroupRepository.save(userGroupEntity), UserGroupDTO.class);
             }
         }
     }

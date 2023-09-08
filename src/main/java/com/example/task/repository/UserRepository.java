@@ -10,7 +10,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByUsernameAndStatus(String username, String status);
 
     Optional<UserEntity> findByUsername(String username);
-
-    @Query(value = "select count(*) from USER where USERNAME like ?1%", nativeQuery = true)
-    int lastNumberUser(String username);
+    int countByUsernameStartsWith(String username);
 }

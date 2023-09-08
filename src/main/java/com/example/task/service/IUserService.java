@@ -22,4 +22,5 @@ public interface IUserService {
     List<UserDTO> findByAdminUser();
     List<UserDTO> findByAdminTask();
     void sendMail(String to ,String title,String content);
+    String getMailDefault();
 }

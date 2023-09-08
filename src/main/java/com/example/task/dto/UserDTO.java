@@ -1,8 +1,8 @@
 package com.example.task.dto;
 
-import java.util.Date;
+import com.example.task.dto.constant.StatusUser;
 
-import static com.example.task.dto.constant.StatusUser.ACTIVE;
+import java.util.Date;
 
 
 public class UserDTO extends BaseDTO<UserDTO> {
@@ -13,7 +13,7 @@ public class UserDTO extends BaseDTO<UserDTO> {
 
     private String fullName;
 
-    private String status = ACTIVE;
+    private StatusUser status = StatusUser.ACTIVE;
 
     private Date createdDate;
 
@@ -70,11 +70,11 @@ public class UserDTO extends BaseDTO<UserDTO> {
         this.fullName = fullName;
     }
 
-    public String getStatus() {
+    public StatusUser getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusUser status) {
         this.status = status;
     }
 

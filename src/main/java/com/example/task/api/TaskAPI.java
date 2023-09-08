@@ -1,15 +1,9 @@
 package com.example.task.api;
 
-import com.example.task.Output.ResponseList;
 import com.example.task.dto.TaskDTO;
 import com.example.task.service.ITaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 //(value = "manager/api/task")
 @RestController(value = "apiOfTask")

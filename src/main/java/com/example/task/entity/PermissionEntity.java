@@ -7,11 +7,11 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "permission")
 public class PermissionEntity extends BaseEntity{
-    @Column(name = "name")
+    @Column()
     private String name;
-    @Column(name = "code")
+    @Column()
     private String code;
-    @Column(name = "note")
+    @Column()
     private String note;
 
     public String getName() {

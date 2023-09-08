@@ -1,7 +1,9 @@
 package com.example.task.dto;
 
+import com.example.task.dto.constant.Roles;
+import com.example.task.dto.constant.StatusTask;
+
 import java.sql.Timestamp;
-import java.util.Date;
 
 
 public class TaskDTO extends BaseDTO<TaskDTO> {
@@ -14,11 +16,11 @@ public class TaskDTO extends BaseDTO<TaskDTO> {
 
     private Timestamp deadlineEnd;
 
-    private String status ;
+    private StatusTask status = StatusTask.READY;
 
     private String createdBy;
 
-    private String performer;
+    private String performer = String.valueOf(Roles.admin);
 
     public String getTitle() {
         return title;
@@ -52,11 +54,11 @@ public class TaskDTO extends BaseDTO<TaskDTO> {
         this.deadlineEnd = deadlineEnd;
     }
 
-    public String getStatus() {
+    public StatusTask getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusTask status) {
         this.status = status;
     }
 

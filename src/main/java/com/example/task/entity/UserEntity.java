@@ -14,13 +14,13 @@ import java.util.Date;
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity extends BaseEntity {
-    @Column(name = "username")
+    @Column()
     private String username;
-    @Column(name = "password")
+    @Column()
     private String password;
-    @Column(name = "fullname")
+    @Column(name = "full_name")
     private String fullName;
-    @Column(name = "status")
+    @Column()
     private String status;
     @Column(name = "created_date")
     @CreatedDate
@@ -28,7 +28,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
-    @Column(name = "email")
+    @Column()
     private String email;
 
     public String getEmail() {
