@@ -7,7 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
-<c:url var="UserAPIURL" value="/api-user"/>
+<c:url var="UserAPIURL" value="/api/user"/>
 <c:url var="ListURL" value="/admin-user-list">
     <c:param name="page" value="1"></c:param>
     <c:param name="limit" value="4"></c:param>
@@ -56,6 +56,11 @@
 
             <div class="row">
                 <div class="col-xs-12">
+                    <c:if test="${not empty message}">
+                        <div class="alert alert-${alert}">
+                                ${message}
+                        </div>
+                    </c:if>
                     <!-- PAGE CONTENT BEGINS -->
                     <form:form class="form-horizontal" role="form" id="formSubmit" modelAttribute="model">
                         <div class="form-group">
@@ -153,6 +158,9 @@
         } else {
             update(data);
         }
+    });
+    $(".alert").delay(2000).slideUp(200, function () {
+        $(this).alert('close');
     });
 
     function create(data) {

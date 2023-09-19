@@ -1,5 +1,7 @@
 package com.example.task.entity;
 
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,6 +15,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "task")
 @EntityListeners(AuditingEntityListener.class)
+@FieldNameConstants
 public class TaskEntity extends BaseEntity  implements Serializable {
     private static final long serialVersionUID = -7941769011539363185L;
     @Column()

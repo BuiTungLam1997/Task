@@ -1,11 +1,10 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.GroupDTO;
-import com.example.task.entity.GroupEntity;
-import com.example.task.entity.TaskEntity;
 import com.example.task.repository.GroupRepository;
 import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
+import com.example.task.transformer.GroupTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,21 +17,38 @@ public class GroupService extends BaseService implements IGroupService {
     private GroupRepository groupRepository;
     @Autowired
     private IUserGroupService userGroupService;
-
+    @Autowired
+    private GroupTransformer groupTransformer;
 
 
     @Override
     public GroupDTO findById(Long groupId) {
-        return modelMapper.map(groupRepository.findById(groupId), GroupDTO.class);
+        return groupTransformer.opToDto(groupRepository.findById(groupId));
     }
 
     @Override
     public List<GroupDTO> findByUserId(Long userId) {
-        List<Long> groupIdS = userGroupService.findGroupId(userId);
-        return groupIdS.stream()
+        return userGroupService.findGroupId(userId).stream()
                 .map(item -> groupRepository.findById(item))
-                .map(item -> modelMapper.map(item, GroupDTO.class))
+                .map(item -> groupTransformer.opToDto(item))
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public GroupDTO save(GroupDTO groupDTO) {
+        return groupTransformer.toDto(groupRepository.save(groupTransformer.toEntity(groupDTO)));
+    }
+
+    @Override
+    public GroupDTO update(GroupDTO groupDTO) {
+        return groupTransformer.toDto(groupRepository.save(groupTransformer.toEntity(groupDTO)));
+    }
+
+    @Override
+    public void delete(Long[] ids) {
+        for (Long item : ids) {
+            groupRepository.deleteById(item);
+        }
     }
 }

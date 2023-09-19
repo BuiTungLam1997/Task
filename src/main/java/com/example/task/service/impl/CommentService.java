@@ -1,12 +1,10 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.CommentDTO;
-import com.example.task.entity.CommentEntity;
-import com.example.task.entity.TaskEntity;
 import com.example.task.repository.CommentRepository;
 import com.example.task.repository.UserRepository;
 import com.example.task.service.ICommentService;
-import com.example.task.service.IUserService;
+import com.example.task.transformer.CommentTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,7 @@ public class CommentService extends BaseService implements ICommentService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private IUserService userService;
+    private CommentTransformer commentTransformer;
 
     @Override
     public List<CommentDTO> findAll() {
@@ -35,8 +33,7 @@ public class CommentService extends BaseService implements ICommentService {
 
     @Override
     public CommentDTO save(CommentDTO commentDTO) {
-        CommentEntity commentEntity = modelMapper.map(commentDTO, CommentEntity.class);
-        return modelMapper.map(commentRepository.save(commentEntity), CommentDTO.class);
+        return commentTransformer.toDto(commentRepository.save(commentTransformer.toEntity(commentDTO)));
     }
 
     @Override
@@ -53,9 +50,8 @@ public class CommentService extends BaseService implements ICommentService {
 
     @Override
     public List<CommentDTO> findByTaskId(Long taskId) {
-        List<CommentEntity> commentEntity = commentRepository.findByTaskId(taskId);
-        return commentEntity.stream()
-                .map(item -> modelMapper.map(item, CommentDTO.class))
+        return commentRepository.findByTaskId(taskId).stream()
+                .map(item -> commentTransformer.toDto(item))
                 .collect(Collectors.toList());
     }
 
@@ -66,10 +62,9 @@ public class CommentService extends BaseService implements ICommentService {
 
     @Override
     public List<CommentDTO> setListResult(Long taskId) {
-        List<CommentEntity> commentEntities = commentRepository.findByTaskId(taskId);
-        return commentEntities.stream()
+        return commentRepository.findByTaskId(taskId).stream()
                 .map(item -> modelMapper.map(item, CommentDTO.class))
-                .peek(item -> item.setFullName(userRepository.findById(item.getUserId()).get().getFullName()))
+                .peek(item -> userRepository.findById(item.getUserId()).ifPresent(user -> item.setFullName(user.getFullName())))
                 .collect(Collectors.toList());
     }
 }

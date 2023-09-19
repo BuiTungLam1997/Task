@@ -2,11 +2,14 @@ package com.example.task.controller.admin;
 
 import com.example.task.dto.TaskDTO;
 import com.example.task.dto.UserDTO;
+import com.example.task.entity.TaskEntity;
 import com.example.task.mail.emailService;
 import com.example.task.service.ITaskService;
 import com.example.task.service.IUserService;
+import com.example.task.service.filter.FilterTask;
 import com.example.task.utils.MessageUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -16,8 +19,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import static com.example.task.dto.constant.Pageable.defaultLimit;
+import static com.example.task.dto.constant.Pageable.defaultPage;
 
 @Controller
 public class TaskController {
@@ -29,13 +37,27 @@ public class TaskController {
     private IUserService userService;
     @Autowired
     private emailService emailService;
+    @Autowired
+    private FilterTask filterTask;
+
     @GetMapping(value = "/admin-task-list")
     public ModelAndView newsList(@ModelAttribute("model") TaskDTO taskDTO,
-                                 @RequestParam("page") int page,
-                                 @RequestParam("limit") int limit,
+                                 @RequestParam(value = "page", required = false) Integer page,
+                                 @RequestParam(value = "limit", required = false) Integer limit,
                                  @RequestParam(value = "message", required = false) String message) {
+
+        if (page == null || limit == null) {
+            page = defaultPage;
+            limit = defaultLimit;
+        }
         Pageable pageable = PageRequest.of(page - 1, limit);
-        taskSetter(taskDTO, page, limit, pageable);
+
+        Page<TaskDTO> pageResult = taskService.query(pageable);
+        taskDTO.setPage(page);
+        taskDTO.setLimit(limit);
+        taskDTO.setListResult(pageResult.getContent());
+        taskDTO.setTotalItem((int) pageResult.getTotalElements());
+        taskDTO.setTotalPage(pageResult.getTotalPages());
 
         ModelAndView mav = new ModelAndView("/admin/task/list");
         mav.addObject("model", taskDTO);
@@ -46,14 +68,6 @@ public class TaskController {
             mav.addObject("alert", result.get("alert"));
         }
         return mav;
-    }
-
-    private void taskSetter(TaskDTO taskDTO, int page, int limit, Pageable pageable) {
-        taskDTO.setPage(page);
-        taskDTO.setLimit(limit);
-        taskDTO.setListResult(taskService.findAll(pageable));
-        taskDTO.setTotalItem(taskService.getTotalItem());
-        taskDTO.setTotalPage(taskService.getTotalPage(taskDTO));
     }
 
     @GetMapping(value = "/admin-task-edit")
@@ -97,7 +111,50 @@ public class TaskController {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
 
+    @GetMapping(value = "/admin-search-task")
+    public ModelAndView searchTask(@RequestParam(value = "search", required = false) String search,
+                                   @RequestParam(value = "page", required = false) Integer page,
+                                   @RequestParam(value = "limit", required = false) Integer limit,
+                                   @RequestParam(value = "message", required = false) String message) {
+        if (Objects.equals(search, "")) {
+            return new ModelAndView("redirect:/admin-task-list");
+        }
+        TaskDTO taskDTO = new TaskDTO();
+        if (page == null || limit == null) {
+            page = defaultPage;
+            limit = defaultLimit;
+        }
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        Page<TaskDTO> pageResult = taskService.queryExample(pageable);
+        taskDTO.setPage(page);
+        taskDTO.setLimit(limit);
+        taskDTO.setTotalPage(pageResult.getTotalPages());
+        taskDTO.setTotalItem((int) pageResult.getTotalElements());
+
+
+        if (taskService.countByPerformer(search) != 0) {
+            taskDTO.setPerformer(search);
+            taskDTO.setListResult(searchTask(taskDTO));
+            ModelAndView mav = new ModelAndView("/admin/task/search");
+            mav.addObject("model", taskDTO);
+            return mav;
+        }
+        taskService.countByTitle(search);
+        taskDTO.setTitle(search);
+        taskDTO.setListResult(taskService.searchTask(search));
+        //taskDTO.setListResult(searchTask(taskDTO));
+
+        ModelAndView mav = new ModelAndView("/admin/task/list");
+        mav.addObject("model", taskDTO);
+        return mav;
+    }
+
+    private List<TaskDTO> searchTask(TaskDTO taskDTO) {
+        Pageable pageable = PageRequest.of(0, 2);
+        TaskEntity entity = new TaskEntity();
+        return filterTask.search(taskDTO, entity, pageable);
     }
 
     private boolean checkUsername(String username) {

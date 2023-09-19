@@ -7,10 +7,10 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
-<c:url var="TaskAPIURL" value="/api-task"/>
+<c:url var="TaskAPIURL" value="/api/task"/>
 <c:url var="ListURL" value="/admin-task-list">
     <c:param name="page" value="1"></c:param>
-    <c:param name="limit" value="2"></c:param>
+    <c:param name="limit" value="4"></c:param>
 </c:url>
 <html>
 <head>

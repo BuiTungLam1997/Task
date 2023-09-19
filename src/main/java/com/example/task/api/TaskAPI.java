@@ -7,23 +7,23 @@ import org.springframework.web.bind.annotation.*;
 
 //(value = "manager/api/task")
 @RestController(value = "apiOfTask")
-@RequestMapping(path = "/api-task")
+@RequestMapping(value = "/api/task")
 public class TaskAPI {
     @Autowired
     private ITaskService taskService;
 
-    @PostMapping()
+    @PostMapping
     public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
         return taskService.save(taskDTO);
     }
 
-    @PutMapping()
+    @PutMapping
     public TaskDTO updateTask(@RequestBody TaskDTO taskDTO) {
         //luu sang 1 cai db khac de tranh mat du lieu
-        return taskService.save(taskDTO);
+        return taskService.update(taskDTO);
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     public void deleteTask(@RequestBody Long[] ids) {
 
     }

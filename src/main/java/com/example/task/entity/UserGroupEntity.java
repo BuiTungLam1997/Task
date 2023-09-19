@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "usergroup")
+@Table(name = "user_group")
 public class UserGroupEntity extends BaseEntity {
     @Column(name = "user_id")
     private Long userId;

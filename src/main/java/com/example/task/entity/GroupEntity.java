@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "grouppermission")
+@Table(name = "group_permission")
 public class GroupEntity extends BaseEntity{
     @Column()
     private String name;

@@ -1,6 +1,7 @@
 package com.example.task.service;
 
 import com.example.task.dto.UserDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -23,4 +24,8 @@ public interface IUserService {
     List<UserDTO> findByAdminTask();
     void sendMail(String to ,String title,String content);
     String getMailDefault();
+    Page<UserDTO> query(Pageable pageable);
+    Page<UserDTO> querySearch(String search,Pageable pageable);
+    List<UserDTO> searchUser(String search);
+    void deleteUser(Long[] ids);
 }

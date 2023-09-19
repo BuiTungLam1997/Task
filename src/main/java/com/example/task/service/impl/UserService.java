@@ -4,6 +4,7 @@ import com.example.task.dto.GroupDTO;
 import com.example.task.dto.UserDTO;
 import com.example.task.dto.UserGroupDTO;
 import com.example.task.dto.constant.CodePermission;
+import com.example.task.dto.constant.LastNameEmail;
 import com.example.task.dto.constant.StatusUser;
 import com.example.task.entity.GroupEntity;
 import com.example.task.entity.UserEntity;
@@ -16,9 +17,16 @@ import com.example.task.repository.UserRepository;
 import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
 import com.example.task.service.IUserService;
+import com.example.task.service.specifications.Filter.Filter;
+import com.example.task.service.specifications.Filter.FilterBuilder;
+import com.example.task.service.specifications.QueryOperator;
+import com.example.task.service.specifications.UserSearch;
+import com.example.task.transformer.UserTransformer;
 import com.example.task.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +40,7 @@ import java.util.stream.Collectors;
 
 import static com.example.task.dto.constant.Roles.LOGIN;
 import static com.example.task.dto.constant.Roles.admin;
+import static com.example.task.dto.constant.StatusUser.INACTIVE;
 
 @Service
 public class UserService extends BaseService implements IUserService {
@@ -51,6 +60,10 @@ public class UserService extends BaseService implements IUserService {
     private emailService emailService;
     @Autowired
     private PermissionRepository permissionRepository;
+    @Autowired
+    private UserTransformer userTransformer;
+    @Autowired
+    private UserSearch userSearch;
 
 
     @Override
@@ -73,11 +86,9 @@ public class UserService extends BaseService implements IUserService {
 
     @Override
     public List<UserDTO> findAll(Pageable pageable) {
-        List<UserEntity> userEntities = userRepository.findAll(pageable).getContent();
-
-        return userEntities.stream()
-                .map(item -> modelMapper.map(item, UserDTO.class))
-                .collect(Collectors.toList());
+        return userRepository.findAll(pageable)
+                .map(item -> userTransformer.toDto(item))
+                .getContent();
     }
 
     @Override
@@ -133,9 +144,9 @@ public class UserService extends BaseService implements IUserService {
 
     @Override
     public UserDTO update(UserDTO userDTO) {
-        UserEntity user = modelMapper.map(userDTO, UserEntity.class);
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        return modelMapper.map(userRepository.save(user), UserDTO.class);
+
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        return userTransformer.toDto(userRepository.save(userTransformer.toEntity(userDTO)));
     }
 
     @Override
@@ -195,7 +206,7 @@ public class UserService extends BaseService implements IUserService {
 
         return userGroupEntities.stream()
                 .map(item -> userRepository.findById(item))
-                .map(item -> modelMapper.map(item, UserDTO.class))
+                .map(item -> userTransformer.opToDto(item))
                 .collect(Collectors.toList());
     }
 
@@ -217,7 +228,7 @@ public class UserService extends BaseService implements IUserService {
     }
 
     private String createEmail(String username) {
-        String lastEmail = "@gmail.com";
+        String lastEmail = LastNameEmail.email;
         return username + lastEmail;
     }
 
@@ -227,5 +238,44 @@ public class UserService extends BaseService implements IUserService {
             throw new CustomAppException(404, "User not found");
         }
         return modelMapper.map(user, UserDTO.class);
+    }
+
+    @Override
+    public Page<UserDTO> query(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(item -> userTransformer.toDto(item));
+    }
+
+    @Override
+    public List<UserDTO> searchUser(String search) {
+        Filter filter = new FilterBuilder()
+                .buildField("fullName")
+                .buildOperator(QueryOperator.LIKE)
+                .buildValue(search)
+                .build();
+        return userRepository.findAll(userSearch.createSpecification(filter))
+                .stream()
+                .map(item -> userTransformer.toDto(item))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<UserDTO> querySearch(String search, Pageable pageable) {
+        Filter filter = new FilterBuilder()
+                .buildField("fullName")
+                .buildOperator(QueryOperator.LIKE)
+                .buildValue(search)
+                .build();
+        Specification<UserEntity> specification = userSearch.createSpecification(filter);
+        return userRepository.findAll(specification, pageable)
+                .map(item -> userTransformer.toDto(item));
+    }
+
+    @Override
+    public void deleteUser(Long[] ids) {
+        for (Long item : ids) {
+            Optional<UserEntity> user = userRepository.findById(item);
+            user.ifPresent(userEntity -> userEntity.setStatus(String.valueOf(INACTIVE)));
+        }
     }
 }
