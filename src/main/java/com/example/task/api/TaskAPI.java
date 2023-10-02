@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 //(value = "manager/api/task")
-@RestController(value = "apiOfTask")
+@RestController
 @RequestMapping(value = "/api/task")
 public class TaskAPI {
     @Autowired
@@ -14,7 +14,10 @@ public class TaskAPI {
 
     @PostMapping
     public TaskDTO createTask(@RequestBody TaskDTO taskDTO) {
-        return taskService.save(taskDTO);
+        if (taskService.isValidDate(taskDTO)) {
+            return taskService.save(taskDTO);
+        }
+        return null;
     }
 
     @PutMapping
@@ -24,7 +27,7 @@ public class TaskAPI {
     }
 
     @DeleteMapping
-    public void deleteTask(@RequestBody Long[] ids) {
-
+    public void deleteTask(@RequestBody TaskDTO taskDTO) {
+        taskService.delete(taskDTO.getIds());
     }
 }

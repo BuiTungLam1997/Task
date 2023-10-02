@@ -6,6 +6,8 @@ import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
 import com.example.task.transformer.GroupTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,8 +49,30 @@ public class GroupService extends BaseService implements IGroupService {
 
     @Override
     public void delete(Long[] ids) {
+
         for (Long item : ids) {
+            userGroupService.deleteByGroupId(item);
             groupRepository.deleteById(item);
         }
+    }
+
+    @Override
+    public List<GroupDTO> findAll() {
+        return groupRepository.findAll().stream()
+                .map(groupTransformer::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<GroupDTO> findAllPage(Pageable pageable) {
+        return groupRepository.findAll(pageable)
+                .map(groupTransformer::toDto);
+    }
+
+    @Override
+    public List<GroupDTO> findAll(Pageable pageable) {
+        return groupRepository.findAll(pageable).stream()
+                .map(groupTransformer::toDto)
+                .collect(Collectors.toList());
     }
 }

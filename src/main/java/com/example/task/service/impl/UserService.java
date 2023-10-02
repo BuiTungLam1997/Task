@@ -9,7 +9,7 @@ import com.example.task.dto.constant.StatusUser;
 import com.example.task.entity.GroupEntity;
 import com.example.task.entity.UserEntity;
 import com.example.task.exception.CustomAppException;
-import com.example.task.mail.emailService;
+import com.example.task.mail.SendEmailService;
 import com.example.task.repository.GroupRepository;
 import com.example.task.repository.PermissionRepository;
 import com.example.task.repository.UserGroupRepository;
@@ -18,8 +18,8 @@ import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
 import com.example.task.service.IUserService;
 import com.example.task.service.specifications.Filter.Filter;
+import com.example.task.service.specifications.Filter.Filter.QueryOperator;
 import com.example.task.service.specifications.Filter.FilterBuilder;
-import com.example.task.service.specifications.QueryOperator;
 import com.example.task.service.specifications.UserSearch;
 import com.example.task.transformer.UserTransformer;
 import com.example.task.utils.StringUtils;
@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import static com.example.task.dto.constant.Roles.LOGIN;
 import static com.example.task.dto.constant.Roles.admin;
 import static com.example.task.dto.constant.StatusUser.INACTIVE;
+import static com.example.task.entity.UserEntity.Fields;
 
 @Service
 public class UserService extends BaseService implements IUserService {
@@ -57,7 +58,7 @@ public class UserService extends BaseService implements IUserService {
     @Autowired
     private IUserGroupService userGroupService;
     @Autowired
-    private emailService emailService;
+    private SendEmailService sendEmailService;
     @Autowired
     private PermissionRepository permissionRepository;
     @Autowired
@@ -82,6 +83,16 @@ public class UserService extends BaseService implements IUserService {
             }
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public void delete(Long[] ids) {
+        for (Long item : ids) {
+            userGroupService.deleteByUserId(item);
+            UserDTO userDTO = findById(item);
+            userDTO.setStatus(INACTIVE);
+            update(userDTO);
+        }
     }
 
     @Override
@@ -188,7 +199,7 @@ public class UserService extends BaseService implements IUserService {
 
     @Override
     public void sendMail(String to, String title, String content) {
-        emailService.sendMail(to, title, content);
+        sendEmailService.sendMail(to, title, content);
     }
 
     @Override
@@ -228,7 +239,7 @@ public class UserService extends BaseService implements IUserService {
     }
 
     private String createEmail(String username) {
-        String lastEmail = LastNameEmail.email;
+        String lastEmail = LastNameEmail.EMAIL;
         return username + lastEmail;
     }
 
@@ -249,26 +260,27 @@ public class UserService extends BaseService implements IUserService {
     @Override
     public List<UserDTO> searchUser(String search) {
         Filter filter = new FilterBuilder()
-                .buildField("fullName")
+                .buildField(Fields.fullName)
                 .buildOperator(QueryOperator.LIKE)
                 .buildValue(search)
                 .build();
-        return userRepository.findAll(userSearch.createSpecification(filter))
+        Specification<UserEntity> specification = userSearch.createSpecification(filter);
+        return userRepository.findAll(specification)
                 .stream()
-                .map(item -> userTransformer.toDto(item))
+                .map(userTransformer::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Page<UserDTO> querySearch(String search, Pageable pageable) {
         Filter filter = new FilterBuilder()
-                .buildField("fullName")
+                .buildField(Fields.fullName)
                 .buildOperator(QueryOperator.LIKE)
                 .buildValue(search)
                 .build();
         Specification<UserEntity> specification = userSearch.createSpecification(filter);
         return userRepository.findAll(specification, pageable)
-                .map(item -> userTransformer.toDto(item));
+                .map(userTransformer::toDto);
     }
 
     @Override
@@ -277,5 +289,15 @@ public class UserService extends BaseService implements IUserService {
             Optional<UserEntity> user = userRepository.findById(item);
             user.ifPresent(userEntity -> userEntity.setStatus(String.valueOf(INACTIVE)));
         }
+    }
+
+    @Override
+    public List<String> findAllUsername() {
+        return userRepository.findAllUsername();
+    }
+
+    @Override
+    public List<String> getListPermission(String username) {
+        return userRepository.findAllPermissionByUsername(username);
     }
 }

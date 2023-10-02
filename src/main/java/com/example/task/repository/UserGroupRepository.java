@@ -13,4 +13,8 @@ public interface UserGroupRepository extends JpaRepository<UserGroupEntity,Long>
 
     @Query(value = "SELECT DISTINCT u.userId FROM UserGroupEntity u WHERE u.groupId = ?1")
     List<Long> findByGroupId(Long groupId);
+    List<UserGroupEntity> findAllByGroupId(Long groupId);
+    void deleteByUserId(Long userId);
+    void deleteByGroupId(Long groupId);
+    void deleteByPermissionId(Long permissionId);
 }

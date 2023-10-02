@@ -66,6 +66,20 @@
                     <b class="arrow"></b>
                 </li>
                 <li>
+                    <a href='<c:url value="/admin-permission-list?page=1&limit=4"/>'>
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Danh sách quyền hạn
+                    </a>
+                    <b class="arrow"></b>
+                </li>
+                <li>
+                    <a href='<c:url value="/admin-group-list?page=1&limit=4"/>'>
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Danh sách group
+                    </a>
+                    <b class="arrow"></b>
+                </li>
+                <li>
                     <a href="#" class="dropdown-toggle">
                         <i class="menu-icon fa fa-list"></i>
                         <span class="menu-text"></span>

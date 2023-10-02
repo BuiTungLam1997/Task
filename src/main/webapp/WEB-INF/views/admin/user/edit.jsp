@@ -56,9 +56,9 @@
 
             <div class="row">
                 <div class="col-xs-12">
-                    <c:if test="${not empty message}">
-                        <div class="alert alert-${alert}">
-                                ${message}
+                    <c:if test="${not empty MESSAGE}">
+                        <div class="alert alert-${ALERT}">
+                                ${MESSAGE}
                         </div>
                     </c:if>
                     <!-- PAGE CONTENT BEGINS -->
@@ -130,7 +130,6 @@
                                     </button>
                                 </c:if>
                                 <input class="btn" type="reset">
-                                <i class="ace-icon fa fa-undo bigger-110"></i>
                                 </input>
                             </div>
                         </div>
@@ -152,8 +151,7 @@
         });
         const id = $('#id').val();
 
-
-        if (id == "") {
+        if (id) {
             create(data);
         } else {
             update(data);

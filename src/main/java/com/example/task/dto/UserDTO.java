@@ -3,6 +3,7 @@ package com.example.task.dto;
 import com.example.task.dto.constant.StatusUser;
 
 import java.util.Date;
+import java.util.List;
 
 
 public class UserDTO extends BaseDTO<UserDTO> {
@@ -21,6 +22,15 @@ public class UserDTO extends BaseDTO<UserDTO> {
     private String email;
     private String newPassword;
     private String retypePassword;
+    private List<String> listPermission;
+
+    public List<String> getListPermission() {
+        return listPermission;
+    }
+
+    public void setListPermission(List<String> listPermission) {
+        this.listPermission = listPermission;
+    }
 
     public String getNewPassword() {
         return newPassword;

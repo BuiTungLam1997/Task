@@ -31,9 +31,9 @@ To change this template use File | Settings | File Templates.
             <div class="page-content">
                 <div class="row">
                     <div class="col-xs-12">
-                        <c:if test="${not empty message}">
-                            <div class="alert alert-${alert}">
-                                    ${message}
+                        <c:if test="${not empty MESSAGE}">
+                            <div class="alert alert-${ALERT}">
+                                    ${MESSAGE}
                             </div>
                         </c:if>
                         <div class="row">
@@ -44,6 +44,15 @@ To change this template use File | Settings | File Templates.
                                         <button type="submit" onclick="fun()" id="btnSearch">Submit
                                         </button>
                                     </form>
+                                    <div class="dropdown">
+                                        <button class="dropbtn">Trạng thái công việc</button>
+                                        <div class="dropdown-content">
+                                            <a href="/admin-search-task">All</a>
+                                            <a href="/admin-search-task?search=ready">READY</a>
+                                            <a href="/admin-search-task?search=working">WORKING</a>
+                                            <a href="/admin-search-task?search=done">DONE</a>
+                                        </div>
+                                    </div>
                                     <form action="<c:url value="/admin-task-list"/>" id="formSubmit" method="get">
                                         <div class="pull-right tableTools-container">
                                             <div class="dt-buttons btn-overlap btn-group">
@@ -100,7 +109,6 @@ To change this template use File | Settings | File Templates.
                                                         </c:url>
                                                         <c:url var="giveAJob" value="/admin-task-giveAJob">
                                                             <c:param name="id" value="${item.id}"/>
-                                                            <c:param name="performer" value="${item.performer}"/>
                                                         </c:url>
                                                         <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
                                                            title="Cập nhật bài viết" href='${updateTaskURL}'>
@@ -116,12 +124,12 @@ To change this template use File | Settings | File Templates.
                                                         </a>
                                                     </td>
                                                 </tr>
+                                                <input type="hidden" value="" id="page" name="page">
+                                                <input type="hidden" value="" id="limit" name="limit">
                                             </c:forEach>
                                             </tbody>
                                         </table>
                                         <ul class="pagination" id="pagination"></ul>
-                                        <input type="hidden" value="" id="page" name="page">
-                                        <input type="hidden" value="" id="limit" name="limit">
                                     </form>
                                 </div>
                             </div>
@@ -141,7 +149,7 @@ To change this template use File | Settings | File Templates.
             visiblePages: limit,
             startPage: currentPage,
             onPageClick: function (event, page) {
-                if (currentPage != page) {
+                if (currentPage !== page) {
                     $('#limit').val(limit);
                     $('#page').val(page);
                     $('#formSubmit').submit();

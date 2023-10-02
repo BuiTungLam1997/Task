@@ -8,6 +8,7 @@ To change this template use File | Settings | File Templates.
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
 <c:url var="APIUrl" value="/api/user"/>
+<c:url var="UserGroupAPIUrl" value="api/user-group"/>
 <c:url var="UserURL" value="/admin-user-list">
     <c:param name="page" value="1"></c:param>
     <c:param name="limit" value="4"></c:param>
@@ -31,9 +32,9 @@ To change this template use File | Settings | File Templates.
             <div class="page-content">
                 <div class="row">
                     <div class="col-xs-12">
-                        <c:if test="${not empty message}">
-                            <div class="alert alert-${alert}">
-                                    ${message}
+                        <c:if test="${not empty MESSAGE}">
+                                <div class="alert alert-${ALERT}">
+                                    ${MESSAGE}
                             </div>
                         </c:if>
                         <div class="row">
@@ -44,6 +45,16 @@ To change this template use File | Settings | File Templates.
                                         <button type="submit" onclick="fun()" id="btnSearch">Submit
                                         </button>
                                     </form>
+
+                                    <form action="<c:url value="${APIUrl}"/>" method="put" id="formGroup">
+                                        <select id="groupId" name="groupId">
+                                            <c:forEach var="item" items="${modelGroup.listResult}">
+                                                <option value="${item.id}">${item.name}</option>
+                                            </c:forEach>
+                                        </select>
+                                        <button type="submit" id="btnAdd"> Add</button>
+                                    </form>
+
                                     <form action="<c:url value="/admin-user-list"/>" id="formSubmit" method="get">
                                         <div class="pull-right tableTools-container">
                                             <div class="dt-buttons btn-overlap btn-group">
@@ -72,11 +83,11 @@ To change this template use File | Settings | File Templates.
                                                 <th><input type="checkbox" id="checkAll"></th>
                                                 <th>Id</th>
                                                 <th>Username</th>
-                                                <th>Password</th>
                                                 <th>Full name</th>
                                                 <th>Status</th>
                                                 <th>Created Date</th>
                                                 <th>created By</th>
+                                                <th>Email</th>
                                                 <th>Thao tác</th>
                                             </tr>
                                             </thead>
@@ -88,11 +99,11 @@ To change this template use File | Settings | File Templates.
                                                     </td>
                                                     <td>${item.id}</td>
                                                     <td>${item.username}</td>
-                                                    <td>${item.password}</td>
                                                     <td>${item.fullName}</td>
                                                     <td>${item.status}</td>
                                                     <td>${item.createdDate}</td>
                                                     <td>${item.createdBy}</td>
+                                                    <td>${item.email}</td>
                                                     <td>
                                                         <c:url var="updateUserURL" value="/admin-user-edit">
                                                             <c:param name="id" value="${item.id}"/>
@@ -140,6 +151,21 @@ To change this template use File | Settings | File Templates.
         $(this).alert('close');
     });
 
+    $('#btnAdd').click(function (e) {
+        e.preventDefault();
+        const formData = $('#formGroup').serializeArray();
+        const data = {};
+        $.each(formData, function (i, v) {
+            data["" + v.name + ""] = v.value;
+        });
+        const dataArray = $('tbody input[type=checkbox]:checked').map(function () {
+            return $(this).val();
+        }).get();
+        data ['ids'] = dataArray;
+        addGroup(data);
+
+    });
+
     function fun() {
         $('#search').val();
         $('#btnSearch').submit();
@@ -159,10 +185,11 @@ To change this template use File | Settings | File Templates.
             closeOnCancel: false
         }).then(function (isConfirm) {
             if (isConfirm) {
-                const data = {};
-                data ["ids"] = $('tbody input[type=checkbox]:checked').map(function () {
+                var data = {};
+                var dataArray = $('tbody input[type=checkbox]:checked').map(function () {
                     return $(this).val();
                 }).get();
+                data ['ids'] = dataArray;
                 deleteDevice(data);
             }
         });
@@ -176,6 +203,21 @@ To change this template use File | Settings | File Templates.
             data: JSON.stringify(data),
             success: function (result) {
                 window.location.href = '${UserURL}&message=delete_success';
+            },
+            error: function (error) {
+                window.location.href = '${UserURL}&message=error_system';
+            },
+        });
+    }
+
+    function addGroup(data) {
+        $.ajax({
+            url: '${UserGroupAPIUrl}',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                window.location.href = '${UserURL}&message=insert_success';
             },
             error: function (error) {
                 window.location.href = '${UserURL}&message=error_system';

@@ -32,6 +32,7 @@
 <%--  CSS COMMENT  --%>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/template/comment/style.css">
+    <link rel="stylesheet" href="/template/admin/css/dropdown.css">
 </head>
 <body class="no-skin">
 <!-- header -->

@@ -1,7 +1,7 @@
 package com.example.task.dto;
 
 
-public class GroupDTO extends BaseDTO {
+public class GroupDTO extends BaseDTO<GroupDTO> {
 
     private String name;
 

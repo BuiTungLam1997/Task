@@ -1,6 +1,7 @@
 package com.example.task.entity;
 
-import lombok.experimental.FieldDefaults;
+import com.example.task.dto.constant.Roles;
+import com.example.task.dto.constant.StatusTask;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,7 +24,7 @@ public class TaskEntity extends BaseEntity  implements Serializable {
     @Column(columnDefinition = "TEXT")
     private String content;
     @Column()
-    private String status;
+    private String status = String.valueOf(StatusTask.READY);
     @Column()
     private String performer;
     @Column(name = "deadline_start")
@@ -32,7 +33,7 @@ public class TaskEntity extends BaseEntity  implements Serializable {
     private Timestamp deadlineEnd;
     @Column(name = "created_by")
     @CreatedBy
-    private String createdBy;
+    private String createdBy = String.valueOf(Roles.admin);
 
     public String getTitle() {
         return title;

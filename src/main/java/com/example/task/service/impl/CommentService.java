@@ -3,6 +3,7 @@ package com.example.task.service.impl;
 import com.example.task.dto.CommentDTO;
 import com.example.task.repository.CommentRepository;
 import com.example.task.repository.UserRepository;
+import com.example.task.repository.projection.CommentProjection;
 import com.example.task.service.ICommentService;
 import com.example.task.transformer.CommentTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,8 @@ public class CommentService extends BaseService implements ICommentService {
     @Override
     public List<CommentDTO> findByTaskId(Long taskId) {
         return commentRepository.findByTaskId(taskId).stream()
-                .map(item -> commentTransformer.toDto(item))
+                .map(CommentProjection::toEntity)
+                .map(commentTransformer::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -63,8 +65,8 @@ public class CommentService extends BaseService implements ICommentService {
     @Override
     public List<CommentDTO> setListResult(Long taskId) {
         return commentRepository.findByTaskId(taskId).stream()
-                .map(item -> modelMapper.map(item, CommentDTO.class))
-                .peek(item -> userRepository.findById(item.getUserId()).ifPresent(user -> item.setFullName(user.getFullName())))
+                .map(CommentProjection::toEntity)
+                .map(commentTransformer::toDto)
                 .collect(Collectors.toList());
     }
 }

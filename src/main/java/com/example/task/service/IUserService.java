@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface IUserService {
     List<GrantedAuthority> findByListAuthorities(String username);
+
+    void delete(Long[] ids);
     List<UserDTO> findAll(Pageable pageable);
     Optional<UserDTO> findByUsername(String username);
     int getTotalItem();
@@ -28,4 +30,7 @@ public interface IUserService {
     Page<UserDTO> querySearch(String search,Pageable pageable);
     List<UserDTO> searchUser(String search);
     void deleteUser(Long[] ids);
+    List<String> findAllUsername();
+    List<String> getListPermission(String username);
+
 }

@@ -11,6 +11,24 @@ public class BaseDTO<T> {
     private int limit;
     private int totalItem;
     private String message;
+    private Long[] ids;
+    private String searchResponse;
+
+    public String getSearchResponse() {
+        return searchResponse;
+    }
+
+    public void setSearchResponse(String searchResponse) {
+        this.searchResponse = searchResponse;
+    }
+
+    public Long[] getIds() {
+        return ids;
+    }
+
+    public void setIds(Long[] ids) {
+        this.ids = ids;
+    }
 
     public Long getId() {
         return id;

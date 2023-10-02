@@ -1,5 +1,6 @@
 package com.example.task.entity;
 
+import lombok.experimental.FieldNameConstants;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,6 +14,7 @@ import java.util.Date;
 @Entity
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
+@FieldNameConstants
 public class UserEntity extends BaseEntity {
     @Column()
     private String username;

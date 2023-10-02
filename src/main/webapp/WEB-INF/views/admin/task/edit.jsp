@@ -12,6 +12,8 @@
     <c:param name="page" value="1"></c:param>
     <c:param name="limit" value="4"></c:param>
 </c:url>
+
+<c:url var="EditURL" value="/admin-task-edit"/>
 <html>
 <head>
     <title>Chỉnh sửa bài viết</title>
@@ -56,6 +58,11 @@
 
             <div class="row">
                 <div class="col-xs-12">
+                    <c:if test="${not empty MESSAGE}">
+                        <div class="alert alert-${ALERT}">
+                                ${MESSAGE}
+                        </div>
+                    </c:if>
                     <!-- PAGE CONTENT BEGINS -->
                     <form:form class="form-horizontal" role="form" id="formSubmit" modelAttribute="model">
                         <div class="form-group">
@@ -153,7 +160,7 @@
         const id = $('#id').val();
 
 
-        if (id == "") {
+        if (id === "") {
             create(data);
         } else {
             update(data);
@@ -171,10 +178,14 @@
                 window.location.href = '${ListURL}&message=insert_success';
             },
             error: function (error) {
-                window.location.href = '${ListURL}&message=error_system';
+                window.location.href = '${EditURL}?message=error_system';
             },
         });
     }
+
+    $(".alert").delay(2000).slideUp(200, function () {
+        $(this).alert('close');
+    });
 
     function update(data) {
         $.ajax({
@@ -191,6 +202,7 @@
             },
         });
     }
+
 </script>
 </body>
 </html>
