@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 import static com.example.task.dto.constant.Roles.LOGIN;
 import static com.example.task.dto.constant.Roles.admin;
 import static com.example.task.dto.constant.StatusUser.INACTIVE;
-import static com.example.task.entity.UserEntity.Fields;
 
 @Service
 public class UserService extends BaseService implements IUserService {
@@ -243,14 +242,6 @@ public class UserService extends BaseService implements IUserService {
         return username + lastEmail;
     }
 
-    public UserDTO getUser(String username) {
-        Optional<UserEntity> user = userRepository.findByUsername(username);
-        if (!user.isPresent()) {
-            throw new CustomAppException(404, "User not found");
-        }
-        return modelMapper.map(user, UserDTO.class);
-    }
-
     @Override
     public Page<UserDTO> query(Pageable pageable) {
         return userRepository.findAll(pageable)
@@ -260,7 +251,7 @@ public class UserService extends BaseService implements IUserService {
     @Override
     public List<UserDTO> searchUser(String search) {
         Filter filter = new FilterBuilder()
-                .buildField(Fields.fullName)
+                .buildField(UserEntity.Fields.fullName)
                 .buildOperator(QueryOperator.LIKE)
                 .buildValue(search)
                 .build();
@@ -274,7 +265,7 @@ public class UserService extends BaseService implements IUserService {
     @Override
     public Page<UserDTO> querySearch(String search, Pageable pageable) {
         Filter filter = new FilterBuilder()
-                .buildField(Fields.fullName)
+                .buildField(UserEntity.Fields.fullName)
                 .buildOperator(QueryOperator.LIKE)
                 .buildValue(search)
                 .build();

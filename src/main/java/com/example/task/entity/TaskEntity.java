@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @Table(name = "task")
 @EntityListeners(AuditingEntityListener.class)
 @FieldNameConstants
-public class TaskEntity extends BaseEntity  implements Serializable {
+public class TaskEntity extends BaseEntity implements Serializable {
     private static final long serialVersionUID = -7941769011539363185L;
     @Column()
     private String title;

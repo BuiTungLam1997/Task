@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.example.task.entity.TaskEntity.Fields.*;
 import static com.example.task.service.specifications.Filter.Filter.QueryOperator.LIKE;
 
 @Service
@@ -106,17 +105,17 @@ public class TaskService extends BaseService implements ITaskService {
 
     private Specification<TaskEntity> buildFilter(String search) {
         Filter filterTitle = new FilterBuilder()
-                .buildField(title)
+                .buildField(TaskEntity.Fields.title)
                 .buildOperator(LIKE)
                 .buildValue(search)
                 .build();
         Filter filterPerformer = new FilterBuilder()
-                .buildField(performer)
+                .buildField(TaskEntity.Fields.performer)
                 .buildOperator(LIKE)
                 .buildValue(search)
                 .build();
         Filter filterStatus = new FilterBuilder()
-                .buildField(status)
+                .buildField(TaskEntity.Fields.status)
                 .buildOperator(LIKE)
                 .buildValue(search)
                 .build();

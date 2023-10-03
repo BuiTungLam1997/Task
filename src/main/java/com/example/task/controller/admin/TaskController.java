@@ -28,6 +28,7 @@ import java.util.Optional;
 import static com.example.task.dto.constant.Pageable.defaultLimit;
 import static com.example.task.dto.constant.Pageable.defaultPage;
 import static com.example.task.dto.constant.StatusMessage.*;
+import static com.example.task.dto.constant.StatusSent.UNSENT;
 import static com.example.task.dto.constant.SystemConstant.model;
 
 @Controller
@@ -134,9 +135,10 @@ public class TaskController {
         Optional<UserDTO> userDTO = userService.findByUsername(taskDTO.getPerformer());
         String to = userDTO.map(UserDTO::getEmail).orElseGet(() -> userService.getMailDefault());
         EmailEntity emailEntity = new EmailEntity();
-        emailEntity.setTo(to);
+        emailEntity.setToEmail(to);
         emailEntity.setTitle(taskDTO.getTitle());
         emailEntity.setContent(taskDTO.getContent());
+        emailEntity.setStatusSent(String.valueOf(UNSENT));
         emailService.save(emailEntity);
     }
 
