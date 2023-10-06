@@ -9,16 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SpringBootApplication
-@EnableScheduling
 public class TaskApplication {
-    private static final int NUM_OF_THREAD = 5;
 
     public static void main(String[] args) {
         SpringApplication.run(TaskApplication.class, args);
-
-        ExecutorService executorService = Executors.newFixedThreadPool(NUM_OF_THREAD);
-        Runnable runnable = new ThreadSendEmail();
-        executorService.execute(runnable);
     }
 
 }

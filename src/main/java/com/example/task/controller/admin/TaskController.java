@@ -1,5 +1,6 @@
 package com.example.task.controller.admin;
 
+import com.example.task.dto.EmailDTO;
 import com.example.task.dto.TaskDTO;
 import com.example.task.dto.UserDTO;
 import com.example.task.dto.constant.StatusMessage;
@@ -80,7 +81,7 @@ public class TaskController {
         ModelAndView mav = new ModelAndView("/admin/task/edit");
         Object taskDTO = new TaskDTO();
 
-        taskDTO = (id != null) ? taskService.findById(id) : taskDTO;
+        taskDTO = (id != null) ? taskService.findById(id).get() : taskDTO;
         mav.addObject(model, taskDTO);
 
         if (message != null) {
@@ -134,12 +135,12 @@ public class TaskController {
     private void saveEmail(TaskDTO taskDTO) {
         Optional<UserDTO> userDTO = userService.findByUsername(taskDTO.getPerformer());
         String to = userDTO.map(UserDTO::getEmail).orElseGet(() -> userService.getMailDefault());
-        EmailEntity emailEntity = new EmailEntity();
-        emailEntity.setToEmail(to);
-        emailEntity.setTitle(taskDTO.getTitle());
-        emailEntity.setContent(taskDTO.getContent());
-        emailEntity.setStatusSent(String.valueOf(UNSENT));
-        emailService.save(emailEntity);
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setToEmail(to);
+        emailDTO.setTitle(taskDTO.getTitle());
+        emailDTO.setContent(taskDTO.getContent());
+        emailDTO.setStatusSent(String.valueOf(UNSENT));
+        emailService.save(emailDTO);
     }
 
     @GetMapping(value = "/admin-search-task")
