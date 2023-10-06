@@ -5,13 +5,13 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "usergrouppermission")
+@Table(name = "user_group")
 public class UserGroupEntity extends BaseEntity {
     @Column(name = "user_id")
     private Long userId;
     @Column(name = "permission_id")
     private Long permissionId;
-    @Column(name = "grouppermission_id")
+    @Column(name = "group_id")
     private Long groupId;
 
     public Long getUserId() {

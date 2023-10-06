@@ -1,9 +1,12 @@
 package com.example.task.dto;
 
+import com.example.task.dto.constant.StatusUser;
+
 import java.util.Date;
+import java.util.List;
 
 
-public class UserDTO extends BaseDTO {
+public class UserDTO extends BaseDTO<UserDTO> {
 
     private String username;
 
@@ -11,11 +14,47 @@ public class UserDTO extends BaseDTO {
 
     private String fullName;
 
-    private String status ;
+    private StatusUser status = StatusUser.ACTIVE;
 
-    private Date createdDate ;
+    private Date createdDate;
 
     private String createdBy;
+    private String email;
+    private String newPassword;
+    private String retypePassword;
+    private List<String> listPermission;
+
+    public List<String> getListPermission() {
+        return listPermission;
+    }
+
+    public void setListPermission(List<String> listPermission) {
+        this.listPermission = listPermission;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getRetypePassword() {
+        return retypePassword;
+    }
+
+    public void setRetypePassword(String retypePassword) {
+        this.retypePassword = retypePassword;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getUsername() {
         return username;
@@ -41,11 +80,11 @@ public class UserDTO extends BaseDTO {
         this.fullName = fullName;
     }
 
-    public String getStatus() {
+    public StatusUser getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusUser status) {
         this.status = status;
     }
 

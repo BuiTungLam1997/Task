@@ -1,10 +1,12 @@
 package com.example.task.dto;
 
+import com.example.task.dto.constant.StatusTask;
+
 import java.sql.Timestamp;
-import java.util.Date;
+import java.util.List;
 
 
-public class TaskDTO extends BaseDTO {
+public class TaskDTO extends BaseDTO<TaskDTO> {
 
     private String title;
 
@@ -14,11 +16,20 @@ public class TaskDTO extends BaseDTO {
 
     private Timestamp deadlineEnd;
 
-    private String status ;
+    private StatusTask status;
 
     private String createdBy;
 
     private String performer;
+    private List<String> listUsername;
+
+    public List<String> getListUsername() {
+        return listUsername;
+    }
+
+    public void setListUsername(List<String> listUsername) {
+        this.listUsername = listUsername;
+    }
 
     public String getTitle() {
         return title;
@@ -48,15 +59,15 @@ public class TaskDTO extends BaseDTO {
         return deadlineEnd;
     }
 
-    public void setDeadlineEnd(Timestamp deadline_End) {
-        this.deadlineEnd = deadline_End;
+    public void setDeadlineEnd(Timestamp deadlineEnd) {
+        this.deadlineEnd = deadlineEnd;
     }
 
-    public String getStatus() {
+    public StatusTask getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusTask status) {
         this.status = status;
     }
 

@@ -6,8 +6,17 @@ public class UserGroupDTO extends BaseDTO {
     private Long userId;
 
     private Long permissionId;
+    private Long[] permissionIds;
 
     private Long groupId;
+
+    public Long[] getPermissionIds() {
+        return permissionIds;
+    }
+
+    public void setPermissionIds(Long[] permissionIds) {
+        this.permissionIds = permissionIds;
+    }
 
     public Long getUserId() {
         return userId;

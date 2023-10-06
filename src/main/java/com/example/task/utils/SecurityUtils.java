@@ -8,17 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SecurityUtils {
-    public static MyUser getPrincipal() {
-        MyUser myUser = (MyUser) (SecurityContextHolder.getContext()).getAuthentication().getPrincipal();
+    public static MyUser getPrincipal(){
+        MyUser myUser = (MyUser) (SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return myUser;
     }
-
     public static List<String> getAuthorities() {
-        List<String> results = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         List<GrantedAuthority> authorities = (List<GrantedAuthority>) (SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         for (GrantedAuthority authority : authorities) {
-            results.add(authority.getAuthority());
+            result.add(authority.getAuthority());
         }
-        return results;
+        return result;
     }
 }
