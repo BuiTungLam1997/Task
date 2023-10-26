@@ -14,7 +14,7 @@
 </c:url>
 <html>
 <head>
-    <title>Chỉnh sửa bài viết</title>
+    <title>Chỉnh sửa nhân viên</title>
 </head>
 <body>
 <div class="main-content">
@@ -139,6 +139,21 @@
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.page-content -->
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Tiêu đề</th>
+                <th>Nội dung</th>
+                <th>Ngày bắt đầu</th>
+                <th>Ngày kết thúc</th>
+                <th>createdBy</th>
+                <th>Trạng thái</th>
+            </tr>
+            </thead>
+            <tbody id="listGroup">
+            </tbody>
+        </table>
+        <ul class="pagination"  id="pagination"></ul>
     </div>
 </div>
 <script>
@@ -193,5 +208,6 @@
         });
     }
 </script>
+<script type='text/javascript' src="/template/custom/admin/js/user-list.js"></script>
 </body>
 </html>

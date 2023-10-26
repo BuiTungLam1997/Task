@@ -7,13 +7,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface IGroupService {
-    GroupDTO findById(Long groupId);
+public interface IGroupService extends IBaseService<GroupDTO>{
     List<GroupDTO> findByUserId(Long userId);
     GroupDTO save(GroupDTO groupDTO);
     GroupDTO update(GroupDTO groupDTO);
     void delete(Long[] ids);
-    List<GroupDTO> findAll();
-    Page<GroupDTO> findAllPage(Pageable pageable);
-    List<GroupDTO> findAll(Pageable pageable);
 }

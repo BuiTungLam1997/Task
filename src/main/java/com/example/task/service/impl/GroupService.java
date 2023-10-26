@@ -1,20 +1,24 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.GroupDTO;
+import com.example.task.entity.GroupEntity;
 import com.example.task.repository.GroupRepository;
 import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
+import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.GroupTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class GroupService extends BaseService implements IGroupService {
+public class GroupService extends BaseService<GroupDTO, GroupEntity, GroupRepository> implements IGroupService {
+
     @Autowired
     private GroupRepository groupRepository;
     @Autowired
@@ -22,10 +26,8 @@ public class GroupService extends BaseService implements IGroupService {
     @Autowired
     private GroupTransformer groupTransformer;
 
-
-    @Override
-    public GroupDTO findById(Long groupId) {
-        return groupTransformer.opToDto(groupRepository.findById(groupId));
+    public GroupService(GroupRepository repo, CommonTransformer<GroupDTO, GroupEntity> transformer, EntityManager em) {
+        super(repo, transformer, em);
     }
 
     @Override
@@ -49,30 +51,9 @@ public class GroupService extends BaseService implements IGroupService {
 
     @Override
     public void delete(Long[] ids) {
-
         for (Long item : ids) {
             userGroupService.deleteByGroupId(item);
             groupRepository.deleteById(item);
         }
-    }
-
-    @Override
-    public List<GroupDTO> findAll() {
-        return groupRepository.findAll().stream()
-                .map(groupTransformer::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<GroupDTO> findAllPage(Pageable pageable) {
-        return groupRepository.findAll(pageable)
-                .map(groupTransformer::toDto);
-    }
-
-    @Override
-    public List<GroupDTO> findAll(Pageable pageable) {
-        return groupRepository.findAll(pageable).stream()
-                .map(groupTransformer::toDto)
-                .collect(Collectors.toList());
     }
 }

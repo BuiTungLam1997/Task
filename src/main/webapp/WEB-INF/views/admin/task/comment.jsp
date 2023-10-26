@@ -10,6 +10,8 @@
 <%@ page import="com.example.task.utils.SecurityUtils" %>
 <c:url var="CommentAPI" value="/api/manager/comment"/>
 <c:url var="CommentURL" value="/comment"/>
+<c:url var="TaskAPI" value="/api/task/done-task"/>
+<c:url var="TaskURL" value="/admin-task-list"/>
 <html>
 <head>
     <title>Comment</title>
@@ -60,8 +62,19 @@
                     </div>
                 </div>
                 <div class="space-4"></div>
-
+                <div class="form-group">
+                    <label class="col-sm-3 control-label no-padding-right" for="performer">
+                        Level of difficult : </label>
+                    <div class="col-sm-9">
+                        <form:input path="levelOfDifficulty"  cssClass="col-xs-10 col-sm-5"/>
+                        <button class="btn btn-info" type="button" id="btnUpdatePoint">
+                            <i class="ace-icon fa fa-check bigger-110"></i>
+                            Cập nhật
+                        </button>
+                    </div>
+                </div>
                 <div class="hr hr-24"></div>
+                <input type="hidden" id="id" name="id" value="${modelTask.id}">
             </form:form>
         </div><!-- /.col -->
     </div><!-- /.row -->
@@ -78,7 +91,7 @@
                 <div class="be-comment-content">
 
 				<span class="be-comment-name">
-					<a href="blog-detail-2.html">${item.fullName}</a>
+					<a href="blog-detail-2.html" id="fullName" name="fullName">${item.fullName}</a>
 					</span>
                     <span class="be-comment-time">
                             <i class="fa fa-clock-o">
@@ -111,6 +124,10 @@
                 <i class="ace-icon fa fa-check bigger-110"></i>
                 Submit
             </button>
+            <button class="btn btn-info" type="button" id="btnDoneTask">
+                <i class="ace-icon fa fa-check bigger-110"></i>
+                Hoàn thành
+            </button>
             <input type="hidden" value="${modelTask.id}" id="taskId" name="taskId">
         </form:form>
     </div>
@@ -123,10 +140,13 @@
         $.each(formData, function (i, v) {
             data["" + v.name + ""] = v.value;
         });
-        const id = $('#id').val();
-
-
         create(data);
+    });
+    $('#btnDoneTask').click(function (e) {
+        e.preventDefault();
+        const data = {};
+        data["id"] = document.getElementById(`taskId`).value;
+        update(data);
     });
 
     function create(data) {
@@ -137,10 +157,26 @@
             data: JSON.stringify(data),
             dataType: 'json',
             success: function (result) {
-                window.location.href = '${CommentURL}?id=' + result.taskId + '&message=insert_success';
+                window.location.href = '${CommentURL}?id=' + result.data.taskId + '&message=insert_success';
             },
             error: function (error) {
                 window.location.href = '${CommentURL}?message=error_system';
+            },
+        });
+    }
+
+    function update(data) {
+        $.ajax({
+            url: '${TaskAPI}',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function (result) {
+                window.location.href = '${TaskURL}?message=insert_success';
+            },
+            error: function (error) {
+                window.location.href = '${TaskURL}?message=error_system';
             },
         });
     }
@@ -149,5 +185,6 @@
         $(this).alert('close');
     });
 </script>
+<script type='text/javascript' src="/template/custom/admin/js/comment.js"></script>
 </body>
 </html>

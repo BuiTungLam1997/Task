@@ -6,7 +6,7 @@ import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
 
-public abstract class CommonTransformer<T extends BaseDTO, E extends BaseEntity> implements ITransformer<T, E> {
+public abstract class CommonTransformer<T extends BaseDTO<T>, E extends BaseEntity> implements ITransformer<T, E> {
     private final Class<T> tClass;
     private final Class<E> eClass;
     private final ModelMapper modelMapper;

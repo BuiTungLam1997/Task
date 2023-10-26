@@ -1,28 +1,19 @@
 package com.example.task.service.impl;
 
-import com.example.task.dto.GroupDTO;
-import com.example.task.dto.UserDTO;
-import com.example.task.dto.UserGroupDTO;
-import com.example.task.dto.constant.CodePermission;
-import com.example.task.dto.constant.LastNameEmail;
-import com.example.task.dto.constant.StatusUser;
-import com.example.task.entity.GroupEntity;
-import com.example.task.entity.UserEntity;
-import com.example.task.exception.CustomAppException;
+import com.example.task.dto.*;
+import com.example.task.dto.constant.*;
+import com.example.task.entity.*;
+import com.example.task.exception.NullPointException;
 import com.example.task.mail.SendEmailService;
-import com.example.task.repository.GroupRepository;
-import com.example.task.repository.PermissionRepository;
-import com.example.task.repository.UserGroupRepository;
-import com.example.task.repository.UserRepository;
-import com.example.task.service.IGroupService;
-import com.example.task.service.IUserGroupService;
-import com.example.task.service.IUserService;
-import com.example.task.service.specifications.Filter.Filter;
-import com.example.task.service.specifications.Filter.Filter.QueryOperator;
-import com.example.task.service.specifications.Filter.FilterBuilder;
-import com.example.task.service.specifications.UserSearch;
+import com.example.task.repository.*;
+import com.example.task.repository.specifications.UserSearch;
+import com.example.task.service.*;
+import com.example.task.service.builderpattern.Filter.Filter;
+import com.example.task.service.builderpattern.Filter.FilterBuilder;
+import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.UserTransformer;
 import com.example.task.utils.StringUtils;
+import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +23,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +34,11 @@ import java.util.stream.Collectors;
 import static com.example.task.dto.constant.Roles.LOGIN;
 import static com.example.task.dto.constant.Roles.admin;
 import static com.example.task.dto.constant.StatusUser.INACTIVE;
+import static com.example.task.service.builderpattern.Filter.Filter.QueryOperator.LIKE;
 
 @Service
-public class UserService extends BaseService implements IUserService {
+public class UserService extends BaseService<UserDTO, UserEntity, UserRepository> implements IUserService {
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -64,7 +59,12 @@ public class UserService extends BaseService implements IUserService {
     private UserTransformer userTransformer;
     @Autowired
     private UserSearch userSearch;
+    private final QUserEntity QUser = QUserEntity.userEntity;
 
+
+    public UserService(UserRepository repo, CommonTransformer<UserDTO, UserEntity> transformer, EntityManager em) {
+        super(repo, transformer, em);
+    }
 
     @Override
     public List<GrantedAuthority> findByListAuthorities(String username) {
@@ -88,36 +88,19 @@ public class UserService extends BaseService implements IUserService {
     public void delete(Long[] ids) {
         for (Long item : ids) {
             userGroupService.deleteByUserId(item);
-            UserDTO userDTO = findById(item);
-            userDTO.setStatus(INACTIVE);
-            update(userDTO);
+            Optional<UserDTO> userDTO = findById(item);
+            if (userDTO.isPresent()) {
+                UserDTO user = userDTO.get();
+                userDTO.get().setStatus(INACTIVE);
+                update(user);
+            }
         }
     }
 
     @Override
-    public List<UserDTO> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable)
-                .map(item -> userTransformer.toDto(item))
-                .getContent();
-    }
-
-    @Override
-    public Optional<UserDTO> findByUsername(String username) {
-        Optional<UserEntity> userEntity = userRepository.findByUsername(username);
-        if (userEntity.isPresent()) {
-            return userEntity.map(item -> modelMapper.map(userEntity, UserDTO.class));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public int getTotalItem() {
-        return (int) userRepository.count();
-    }
-
-    @Override
-    public UserDTO findById(Long id) {
-        return modelMapper.map(userRepository.findById(id), UserDTO.class);
+    public UserDTO findByUsername(String username) {
+        JPAQuery<UserEntity> query = new JPAQuery<>(em);
+        return userTransformer.toDto(query.select(QUser).from(QUser).where(QUser.username.eq(username)).fetchFirst());
     }
 
     @Override
@@ -125,12 +108,9 @@ public class UserService extends BaseService implements IUserService {
         userDTO.setUsername(createUsername(userDTO.getFullName()));
         userDTO.setEmail(createEmail(userDTO.getUsername()));
 
-
-        UserEntity user = modelMapper.map(userDTO, UserEntity.class);
-
+        UserEntity user = transformer.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        userDTO = modelMapper.map(userRepository.save(user), UserDTO.class);
-
+        userDTO = transformer.toDto(user);
         addGroup(userDTO);
 
         return userDTO;
@@ -140,16 +120,11 @@ public class UserService extends BaseService implements IUserService {
         UserGroupDTO userGroupDTO = new UserGroupDTO();
         userGroupDTO.setUserId(userDTO.getId());
         userGroupDTO.setGroupId(getGroupIdByRole(String.valueOf(LOGIN)));
-        userGroupDTO.setPermissionId(getPermissionIdByRole(String.valueOf(LOGIN)));
         userGroupService.save(userGroupDTO);
     }
 
     private Long getGroupIdByRole(String role) {
-        return groupRepository.findByCode(role).get().getId();
-    }
-
-    private Long getPermissionIdByRole(String role) {
-        return permissionRepository.findByCode(role).get().getId();
+        return groupRepository.findByCode(role).map(BaseEntity::getId).orElseThrow(NullPointerException::new);
     }
 
     @Override
@@ -170,7 +145,7 @@ public class UserService extends BaseService implements IUserService {
             throw new RuntimeException();
         }
         userEntity.setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
-        return modelMapper.map(userRepository.save(userEntity), UserDTO.class);
+        return transformer.toDto(userRepository.save(userEntity));
     }
 
     @Override
@@ -203,12 +178,12 @@ public class UserService extends BaseService implements IUserService {
 
     @Override
     public String getMailDefault() {
-        return userRepository.findByUsername(String.valueOf(admin)).get().getEmail();
+        return userRepository.findByUsername(String.valueOf(admin)).map(UserEntity::getEmail).orElseThrow(NullPointerException::new);
     }
 
     private List<UserDTO> findByRole(String role) {
         Optional<GroupEntity> group = groupRepository.findByCode(role);
-        List<Long> userGroupEntities = userGroupRepository.findByGroupId(group.get().getId());
+        List<Long> userGroupEntities = userGroupRepository.findByGroupId(group.map(BaseEntity::getId).orElseThrow(NullPointException::new));
 
         if (userGroupEntities.isEmpty()) {
             return Collections.emptyList();
@@ -243,30 +218,10 @@ public class UserService extends BaseService implements IUserService {
     }
 
     @Override
-    public Page<UserDTO> query(Pageable pageable) {
-        return userRepository.findAll(pageable)
-                .map(item -> userTransformer.toDto(item));
-    }
-
-    @Override
-    public List<UserDTO> searchUser(String search) {
-        Filter filter = new FilterBuilder()
-                .buildField(UserEntity.Fields.fullName)
-                .buildOperator(QueryOperator.LIKE)
-                .buildValue(search)
-                .build();
-        Specification<UserEntity> specification = userSearch.createSpecification(filter);
-        return userRepository.findAll(specification)
-                .stream()
-                .map(userTransformer::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public Page<UserDTO> querySearch(String search, Pageable pageable) {
         Filter filter = new FilterBuilder()
                 .buildField(UserEntity.Fields.fullName)
-                .buildOperator(QueryOperator.LIKE)
+                .buildOperator(Filter.QueryOperator.LIKE)
                 .buildValue(search)
                 .build();
         Specification<UserEntity> specification = userSearch.createSpecification(filter);
@@ -290,5 +245,13 @@ public class UserService extends BaseService implements IUserService {
     @Override
     public List<String> getListPermission(String username) {
         return userRepository.findAllPermissionByUsername(username);
+    }
+
+    @Override
+    public List<UserDTO> findByFollow(Long taskId) {
+        return userRepository.findByFollowTask(taskId)
+                .stream()
+                .map(transformer::toDto)
+                .collect(Collectors.toList());
     }
 }

@@ -108,16 +108,28 @@
                                     </button>
                                 </c:if>
                                 <input class="btn" type="reset">
-                                <i class="ace-icon fa fa-undo bigger-110"></i>
-                                </input>
                             </div>
                         </div>
                         <div class="hr hr-24"></div>
-                        <form:hidden path="id" id="id"/>
+                        <input type="hidden" value="${model.id}" name="id" id="id"/>
                     </form:form>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.page-content -->
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Note</th>
+                </tr>
+                </thead>
+                <tbody id="listPermission">
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 <script>
@@ -129,8 +141,6 @@
             data["" + v.name + ""] = v.value;
         });
         const id = $('#id').val();
-
-
         if (id === "") {
             create(data);
         } else {
@@ -175,5 +185,6 @@
     }
 
 </script>
+<script type='text/javascript' src="/template/custom/admin/js/group-list.js"></script>
 </body>
 </html>

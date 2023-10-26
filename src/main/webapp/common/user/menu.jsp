@@ -56,6 +56,14 @@
                         <i class="menu-icon fa fa-caret-right"></i>
                         Danh sách công việc
                     </a>
+                    <a href='<c:url value="/user-task-assign?page=1&limit=4"/>'>
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Danh sách công việc đang thực hiện
+                    </a>
+                    <a href='<c:url value="/user-task-follow"/>'>
+                        <i class="menu-icon fa fa-caret-right"></i>
+                        Danh sách công việc đang theo dõi
+                    </a>
                     <b class="arrow"></b>
                 </li>
             </ul>

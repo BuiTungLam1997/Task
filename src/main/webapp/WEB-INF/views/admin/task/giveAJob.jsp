@@ -8,8 +8,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
 <%@ page import="com.example.task.utils.SecurityUtils" %>
-<c:url var="CommentAPI" value="/manager/api/comment"/>
-<c:url var="CommentURL" value="/comment"/>
+<c:url var="TaskAPI" value="/api/task"/>
+<c:url var="TaskURL" value="/admin-task-list"/>
 <html>
 <head>
     <title>Comment</title>
@@ -24,8 +24,7 @@
                 </div>
             </c:if>
             <!-- PAGE CONTENT BEGINS -->
-            <form:form action="/admin-task-job" class="form-horizontal" role="form" id="formSubmitTask"
-                       modelAttribute="model" method="post">
+            <form:form class="form-horizontal" role="form" id="formSubmitTask" modelAttribute="model">
                 <br>
                 <div class="form-group">
                     <label class="col-sm-3 control-label no-padding-right" for="title"> Title </label>
@@ -74,7 +73,7 @@
                     </div>
                 </div>
                 <div class="hr hr-24"></div>
-                <button class="btn btn-info" type="submit" id="btnSend">
+                <button class="btn btn-info" type="button" id="btnSend">
                     <i class="ace-icon fa fa-check bigger-110"></i>
                     Submit
                 </button>
@@ -85,6 +84,33 @@
 </div>
 </div>
 <script>
+    $('#btnSend').click(function (e) {
+        e.preventDefault();
+        const formData = $('#formSubmitTask').serializeArray();
+        const data = {};
+        $.each(formData, function (i, v) {
+            data["" + v.name + ""] = v.value;
+        });
+        data["status"] = 'WORKING';
+        update(data);
+    });
+
+    function update(data) {
+        $.ajax({
+            url: '${TaskAPI}',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function (result) {
+                window.location.href = '${TaskURL}?message=insert_success';
+            },
+            error: function (error) {
+                window.location.href = '${TaskURL}?message=error_system';
+            },
+        });
+    }
+
     $(".alert").delay(2000).slideUp(200, function () {
         $(this).alert('close');
     });

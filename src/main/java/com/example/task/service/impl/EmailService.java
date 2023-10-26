@@ -1,38 +1,38 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.EmailDTO;
-import com.example.task.dto.constant.SystemConstant;
 import com.example.task.entity.EmailEntity;
 import com.example.task.mail.SendEmailService;
 import com.example.task.repository.EmailRepository;
 import com.example.task.service.IEmailService;
 import com.example.task.transformer.EmailTransformer;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.example.task.dto.constant.StatusSent.SENT;
-import static com.example.task.dto.constant.StatusSent.UNSENT;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class EmailService implements IEmailService {
-    @Autowired
+
     EmailRepository emailRepository;
-    @Autowired
-    private SendEmailService sendEmailService;
-    @Autowired
-    private EmailTransformer emailTransformer;
+    SendEmailService sendEmailService;
+    EmailTransformer emailTransformer;
 
     @Override
-    public List<EmailEntity> findBySent(String statusSent, int limit) {
-        return emailRepository.findByStatusSent(statusSent, limit);
+    public List<EmailDTO> findBySent(String statusSent, int limit) {
+        return emailRepository.findByStatusSent(statusSent, limit)
+                .stream()
+                .map(emailTransformer::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void sendMail(Long id) {
+    public synchronized void sendMail(Long id) {
         Optional<EmailEntity> emailEntity = emailRepository.findById(id);
         if (emailEntity.isPresent()) {
             EmailEntity email = emailEntity.get();
@@ -42,8 +42,6 @@ public class EmailService implements IEmailService {
             String content = email.getContent();
 
             sendEmailService.sendMail(to, title, content);
-            email.setStatusSent(String.valueOf(SENT));
-            emailRepository.save(email);
         }
     }
 
@@ -53,12 +51,18 @@ public class EmailService implements IEmailService {
     }
 
     @Override
+    @Transactional
     public void update(EmailDTO emailDTO) {
         try {
-            emailRepository.save(emailTransformer.toEntity(emailDTO));
+            EmailEntity email = emailTransformer.toEntity(emailDTO);
+            emailRepository.save(email);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Override
+    public EmailDTO findById(Long id) {
+        return emailRepository.findById(id).map(emailTransformer::toDto).orElseThrow(NullPointerException::new);
     }
 }

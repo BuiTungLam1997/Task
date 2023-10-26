@@ -1,64 +1,55 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.TaskDTO;
+import com.example.task.dto.UserDTO;
+import com.example.task.entity.QTaskEntity;
 import com.example.task.entity.TaskEntity;
 import com.example.task.repository.TaskRepository;
+import com.example.task.repository.specifications.TaskSearch;
 import com.example.task.service.ITaskService;
-import com.example.task.service.specifications.Filter.Filter;
-import com.example.task.service.specifications.Filter.FilterBuilder;
-import com.example.task.service.specifications.TaskSearch;
+import com.example.task.service.IUserService;
+import com.example.task.service.builderpattern.Filter.Filter;
+import com.example.task.service.builderpattern.Filter.FilterBuilder;
+import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.TaskTransformer;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.example.task.service.specifications.Filter.Filter.QueryOperator.LIKE;
+import static com.example.task.dto.constant.StatusTask.DONE;
+import static com.example.task.service.builderpattern.Filter.Filter.QueryOperator.LIKE;
 
 @Service
-public class TaskService extends BaseService implements ITaskService {
+public class TaskService extends BaseService<TaskDTO, TaskEntity, TaskRepository> implements ITaskService {
+
     @Autowired
     private TaskRepository taskRepository;
     @Autowired
     private TaskTransformer taskTransformer;
     @Autowired
     private TaskSearch taskSearch;
+    @Autowired
+    private IUserService userService;
+    private QTaskEntity QTask = QTaskEntity.taskEntity;
 
-    @Override
-    public List<TaskDTO> findAll() {
-
-        List<TaskEntity> taskEntities = taskRepository.findAll();
-        return taskEntities.stream()
-                .map(taskTransformer::toDto)
-                .collect(Collectors.toList());
+    public TaskService(TaskRepository repo, CommonTransformer<TaskDTO, TaskEntity> transformer, EntityManager em) {
+        super(repo, transformer, em);
     }
 
-    @Override
-    public List<TaskDTO> findAll(Pageable pageable) {
-        List<TaskEntity> taskEntities = taskRepository.findAll(pageable).getContent();
-        return taskEntities.stream()
-                .map(taskTransformer::toDto)
-                .collect(Collectors.toList());
-    }
 
     @Override
-    public List<TaskDTO> findAllByUsername(Pageable pageable, String username) {
-        List<TaskEntity> taskEntities = taskRepository.findAllByPerformer(username);
-        return taskEntities.stream()
-                .map(taskTransformer::toDto)
-                .collect(Collectors.toList());
-    }
+    public Page<TaskDTO> findAllByUsername(Pageable pageable, String username) {
 
-    @Override
-    public Integer getTotalItem() {
-        return (int) taskRepository.count();
+        return taskRepository.findAllByPerformer(pageable, username).map(taskTransformer::toDto);
     }
 
     @Override
@@ -66,21 +57,15 @@ public class TaskService extends BaseService implements ITaskService {
         return taskRepository.countByPerformer(username);
     }
 
-    @Override
-    public Optional<TaskDTO> findById(Long id) {
-        return taskRepository.findById(id).map(taskTransformer::toDto);
-    }
 
     @Override
     public TaskDTO save(TaskDTO taskDTO) {
-        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
-        return taskTransformer.toDto(taskRepository.save(taskEntity));
+        return taskTransformer.toDto(taskRepository.save(transformer.toEntity(taskDTO)));
     }
 
     @Override
     public TaskDTO update(TaskDTO taskDTO) {
-        TaskEntity taskEntity = modelMapper.map(taskDTO, TaskEntity.class);
-        return taskTransformer.toDto(taskRepository.save(taskEntity));
+        return taskTransformer.toDto(taskRepository.save(taskTransformer.toEntity(taskDTO)));
     }
 
     @Override
@@ -88,13 +73,6 @@ public class TaskService extends BaseService implements ITaskService {
         for (Long item : ids) {
             taskRepository.deleteById(item);
         }
-
-    }
-
-    @Override
-    public Page<TaskDTO> query(Pageable pageable) {
-        return taskRepository.findAll(pageable)
-                .map(item -> taskTransformer.toDto(item));
     }
 
     @Override
@@ -134,8 +112,39 @@ public class TaskService extends BaseService implements ITaskService {
 
     @Override
     public boolean isValidDate(TaskDTO taskDTO) {
-        int day = taskDTO.getDeadlineStart().compareTo(Timestamp.valueOf(LocalDateTime.now()));
+        int day = taskDTO.getDeadlineStart().compareTo(LocalDate.now());
         int day1 = taskDTO.getDeadlineEnd().compareTo(taskDTO.getDeadlineStart());
         return day >= 0 && day1 > 0;
+    }
+
+    @Override
+    public List<TaskDTO> expire() {
+        List<TaskEntity> taskEntity = taskRepository.findLessThanOrEqualDeadlineEnd(LocalDate.now());
+        return taskEntity.stream()
+                .map(taskTransformer::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TaskDTO> findFollowByUserId(Long userId) {
+        return taskRepository.findFollowByUserId(userId)
+                .stream()
+                .map(transformer::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TaskDTO> findByPeriod(Long userId, int period) {
+        UserDTO user = userService.findById(userId).orElseThrow(NullPointerException::new);
+        JPAQuery<TaskDTO> query = new JPAQuery<>(em);
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(QTask.deadlineEnd.before(LocalDate.now()).and(QTask.deadlineEnd.after(LocalDate.now()
+                .minusMonths(period))).and(QTask.performer.eq(user.getUsername())).and(QTask.status.eq(String.valueOf(DONE))));
+        return query.select(QTask).from(QTask).where(builder).fetch().stream().map(taskTransformer::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public int totalItemByPeriod(Long userId, int period) {
+        return findByPeriod(userId, period).size();
     }
 }

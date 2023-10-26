@@ -8,29 +8,39 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.List;
 import java.util.Optional;
 
-public interface IUserService {
+public interface IUserService extends IBaseService<UserDTO> {
     List<GrantedAuthority> findByListAuthorities(String username);
 
     void delete(Long[] ids);
-    List<UserDTO> findAll(Pageable pageable);
-    Optional<UserDTO> findByUsername(String username);
-    int getTotalItem();
-    UserDTO findById(Long id);
+
+    UserDTO findByUsername(String username);
+
     UserDTO save(UserDTO userDTO);
+
     UserDTO update(UserDTO userDTO);
+
     UserDTO changePassword(UserDTO userDTO);
-    boolean checkPassword(String oldPassword,String newPassword);
+
+    boolean checkPassword(String oldPassword, String newPassword);
+
     Boolean isExist(String username);
 
     List<UserDTO> findByAdminUser();
+
     List<UserDTO> findByAdminTask();
-    void sendMail(String to ,String title,String content);
+
+    void sendMail(String to, String title, String content);
+
     String getMailDefault();
-    Page<UserDTO> query(Pageable pageable);
-    Page<UserDTO> querySearch(String search,Pageable pageable);
-    List<UserDTO> searchUser(String search);
+
+    Page<UserDTO> querySearch(String search, Pageable pageable);
+
+
     void deleteUser(Long[] ids);
+
     List<String> findAllUsername();
+
     List<String> getListPermission(String username);
 
+    List<UserDTO> findByFollow(Long taskId);
 }

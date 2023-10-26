@@ -1,19 +1,16 @@
 package com.example.task.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handlerException(Exception ex){
-        ex.printStackTrace();
-        return ResponseEntity.status(500).body("Unknown error!");
-    }
     @ExceptionHandler(CustomAppException.class)
-    public  ResponseEntity<String> customException(CustomAppException ex){
-        ex.printStackTrace();
-        return ResponseEntity.status(500).body("Custom error");
+    public ResponseEntity<Object> customException(CustomAppException ex, WebRequest request) {
+        return new ResponseEntity<>("Đối tượng không tồn tại",HttpStatus.NOT_FOUND);
     }
 }

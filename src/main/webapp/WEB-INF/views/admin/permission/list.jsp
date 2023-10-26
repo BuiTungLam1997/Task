@@ -8,7 +8,7 @@ To change this template use File | Settings | File Templates.
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
 <c:url var="APIurl" value="/api/permission"/>
-<c:url var="UserGroupAPIurl" value="/api/user-group"/>
+<c:url var="PermissionGroupAPI" value="/api/permission-group"/>
 <c:url var="PermissionURL" value="/admin-permission-list">
     <c:param name="page" value="1"></c:param>
     <c:param name="limit" value="4"></c:param>
@@ -48,9 +48,6 @@ To change this template use File | Settings | File Templates.
 
                                 <form action="<c:url value="${APIurl}"/>" method="put" id="formGroup">
                                     <select id="groupId" name="groupId">
-                                        <c:forEach var="item" items="${modelGroup.listResult}">
-                                            <option value="${item.id}">${item.name}</option>
-                                        </c:forEach>
                                     </select>
                                     <button type="submit" id="btnAdd"> Add</button>
                                 </form>
@@ -87,27 +84,7 @@ To change this template use File | Settings | File Templates.
                                             <th>Mote</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
-                                        <c:forEach var="item" items="${model.listResult}">
-                                            <tr>
-                                                <td><input type="checkbox" id="checkbox_${item.id}"
-                                                           value="${item.id}">
-                                                </td>
-                                                <td>${item.id}</td>
-                                                <td>${item.name}</td>
-                                                <td>${item.code}</td>
-                                                <td>${item.note}</td>
-                                                <td>
-                                                    <c:url var="updateTaskURL" value="/admin-permission-edit">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                    </c:url>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Cập nhật bài viết" href='${updateTaskURL}'>
-                                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
+                                        <tbody id="listPermission">
                                         </tbody>
                                     </table>
                                     <ul class="pagination" id="pagination"></ul>
@@ -122,102 +99,7 @@ To change this template use File | Settings | File Templates.
         </div>
     </div>
 </div><!-- /.main-content -->
-<script type="text/javascript">
-    var totalPage = ${model.totalPage};
-    var currentPage = ${model.page};
-    var limit =  ${model.limit};
-    $(function () {
-        window.pagObj = $('#pagination').twbsPagination({
-            totalPages: totalPage,
-            visiblePages: limit,
-            startPage: currentPage,
-            onPageClick: function (event, page) {
-                if (currentPage != page) {
-                    $('#limit').val(limit);
-                    $('#page').val(page);
-                    $('#formSubmit').submit();
-                }
-            }
-        });
-    });
-    $(".alert").delay(2000).slideUp(200, function () {
-        $(this).alert('close');
-    });
-
-    function fun() {
-        $('#search').val();
-        $('#btnSearch').submit();
-    }
-
-    $('#btnAdd').click(function (e) {
-        e.preventDefault();
-        const formData = $('#formGroup').serializeArray();
-        const data = {};
-        $.each(formData, function (i, v) {
-            data["" + v.name + ""] = v.value;
-        });
-        const dataArray = $('tbody input[type=checkbox]:checked').map(function () {
-            return $(this).val();
-        }).get();
-        data ['permissionIds'] = dataArray;
-        addGroup(data);
-
-    });
-
-    function warningBeforeDelete() {
-        swal({
-            title: "Mài có chắc chắn xóa nó không ?",
-            text: "Thấy câu hỏi ở trên không ,ừ chỗ này giống nó đó ,trả lời đi!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonClass: "btn-success",
-            cancelButtonClass: "btn-danger",
-            confirmButtonText: "Có, Con đồng ý xóa thưa ngài!",
-            cancelButtonText: "Không , Con cần thời gian suy nghĩ!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }).then(function (isConfirm) {
-            if (isConfirm) {
-                var data = {};
-                var dataArray = $('tbody input[type=checkbox]:checked').map(function () {
-                    return $(this).val();
-                }).get();
-                data ['ids'] = dataArray;
-                deleteDevice(data);
-            }
-        });
-    }
-
-    function deleteDevice(data) {
-        $.ajax({
-            url: '${APIurl}',
-            type: 'DELETE',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                window.location.href = '${PermissionURL}&message=delete_success';
-            },
-            error: function (error) {
-                window.location.href = '${PermissionURL}&message=error_system';
-            },
-        });
-    }
-
-    function addGroup(data) {
-        $.ajax({
-            url: '${UserGroupAPIurl}',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                window.location.href = '${PermissionURL}&message=delete_success';
-            },
-            error: function (error) {
-                window.location.href = '${PermissionURL}&message=error_system';
-            },
-        });
-    }
-</script>
+<script type='text/javascript' src="/template/custom/admin/js/permission-list.js"></script>
 </body>
 </html>
 

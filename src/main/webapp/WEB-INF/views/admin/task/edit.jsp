@@ -1,10 +1,5 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Thinkpad
-  Date: 05/06/2023
-  Time: 3:09 CH
-  To change this template use File | Settings | File Templates.
---%>
+<%-- Created by IntelliJ IDEA. User: Thinkpad Date: 05/06/2023 Time: 3:09 CH To change this template use File | Settings
+    | File Templates. --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@include file="/common/taglib.jsp" %>
 <c:url var="TaskAPIURL" value="/api/task"/>
@@ -15,9 +10,11 @@
 
 <c:url var="EditURL" value="/admin-task-edit"/>
 <html>
+
 <head>
     <title>Chỉnh sửa bài viết</title>
 </head>
+
 <body>
 <div class="main-content">
     <div class="main-content-inner">
@@ -36,11 +33,11 @@
 
             <div class="nav-search" id="nav-search">
                 <form class="form-search">
-								<span class="input-icon">
-									<input type="text" placeholder="Search ..." class="nav-search-input"
-                                           id="nav-search-input" autocomplete="off"/>
-									<i class="ace-icon fa fa-search nav-search-icon"></i>
-								</span>
+                                    <span class="input-icon">
+                                        <input type="text" placeholder="Search ..." class="nav-search-input"
+                                               id="nav-search-input" autocomplete="off"/>
+                                        <i class="ace-icon fa fa-search nav-search-icon"></i>
+                                    </span>
                 </form>
             </div><!-- /.nav-search -->
         </div>
@@ -64,9 +61,11 @@
                         </div>
                     </c:if>
                     <!-- PAGE CONTENT BEGINS -->
-                    <form:form class="form-horizontal" role="form" id="formSubmit" modelAttribute="model">
+                    <form:form class="form-horizontal" role="form" id="formSubmit"
+                               modelAttribute="model">
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="title"> Title </label>
+                            <label class="col-sm-3 control-label no-padding-right" for="title"> Title
+                            </label>
 
                             <div class="col-sm-9">
                                 <form:input path="title" cssClass="col-xs-10 col-sm-5"/>
@@ -75,7 +74,8 @@
                         <div class="space-4"></div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="content"> Content </label>
+                            <label class="col-sm-3 control-label no-padding-right" for="content">
+                                Content </label>
 
                             <div class="col-sm-9">
                                 <form:input path="content" cssClass="col-xs-10 col-sm-5"/>
@@ -84,24 +84,36 @@
                         <div class="space-4"></div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="performer"> Performer </label>
+                            <label class="col-sm-3 control-label no-padding-right" for="performer">
+                                Performer </label>
 
                             <div class="col-sm-9">
                                 <form:input path="performer" cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
-                        <div class="space-4"></div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="status"> Status : </label>
+                            <label class="col-sm-3 control-label no-padding-right" for="performer">
+                                Level of difficult : </label>
                             <div class="col-sm-9">
-                                <form:input path="status" cssClass="col-xs-10 col-sm-5"/>
+                                <form:input path="levelOfDifficulty" readonly="true" cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label no-padding-right" for="note"> Nhận xét
+                            </label>
+
+                            <div class="col-sm-9">
+                                <form:input path="note" cssClass="col-xs-10 col-sm-5"/>
+                            </div>
+                        </div>
+
                         <div class="space-4"></div>
 
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="deadlineStart"> Deadline
+                            <label class="col-sm-3 control-label no-padding-right" for="deadlineStart">
+                                Deadline
                                 Start </label>
 
                             <div class="col-sm-9">
@@ -112,12 +124,14 @@
                         </div>
                         <div class="space-4"></div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label no-padding-right" for="deadlineEnd"> Deadline
+                            <label class="col-sm-3 control-label no-padding-right" for="deadlineEnd">
+                                Deadline
                                 End </label>
 
                             <div class="col-sm-9">
-                                <input type="datetime-local" id="deadlineEnd" name="deadlineEnd" path="deadlineEnd"
-                                       value="${model.deadlineEnd}" cssClass="col-xs-10 col-sm-5"/>
+                                <input type="datetime-local" id="deadlineEnd" name="deadlineEnd"
+                                       path="deadlineEnd" value="${model.deadlineEnd}"
+                                       cssClass="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
                         <div class="space-4"></div>
@@ -205,4 +219,5 @@
 
 </script>
 </body>
+
 </html>

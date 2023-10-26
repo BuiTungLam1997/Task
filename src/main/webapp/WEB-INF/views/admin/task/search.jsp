@@ -45,6 +45,15 @@ To change this template use File | Settings | File Templates.
                                     <button type="submit" onclick="fun()" id="btnSearch">Submit
                                     </button>
                                 </form>
+                                <div class="dropdown">
+                                    <button class="dropbtn">Trạng thái công việc</button>
+                                    <div class="dropdown-content">
+                                        <a href="/admin-task-list">All</a>
+                                        <a href="/admin-search-task?search=ready">READY</a>
+                                        <a href="/admin-search-task?search=working">WORKING</a>
+                                        <a href="/admin-search-task?search=done">DONE</a>
+                                    </div>
+                                </div>
                                 <form action="<c:url value="/admin-search-task"/>" id="formSubmit" method="get">
                                     <div class="pull-right tableTools-container">
                                         <div class="dt-buttons btn-overlap btn-group">
@@ -71,12 +80,11 @@ To change this template use File | Settings | File Templates.
                                         <thead>
                                         <tr>
                                             <th><input type="checkbox" id="checkAll"></th>
-                                            <th>title</th>
-                                            <th>content</th>
-                                            <th>performer</th>
-                                            <th>deadlineStart</th>
-                                            <th>deadlineEnd</th>
-                                            <th>createdBy</th>
+                                            <th>Tiêu đề</th>
+                                            <th>Nội dung</th>
+                                            <th>Người thực hiện</th>
+                                            <th>Deadline</th>
+                                            <th>Trạng thái</th>
                                             <th>Thao tác</th>
                                         </tr>
                                         </thead>
@@ -89,9 +97,8 @@ To change this template use File | Settings | File Templates.
                                                 <td>${item.title}</td>
                                                 <td>${item.content}</td>
                                                 <td>${item.performer}</td>
-                                                <td>${item.deadlineStart}</td>
                                                 <td>${item.deadlineEnd}</td>
-                                                <td>${item.createdBy}</td>
+                                                <td>${item.status}</td>
                                                 <td>
                                                     <c:url var="updateTaskURL" value="/admin-task-edit">
                                                         <c:param name="id" value="${item.id}"/>
@@ -138,7 +145,7 @@ To change this template use File | Settings | File Templates.
     var totalPage = ${model.totalPage};
     var currentPage = ${model.page};
     var limit = 4;
-    var searchResponse ='${model.searchResponse}';
+    var searchResponse = '${model.searchResponse}';
     $(function () {
         window.pagObj = $('#pagination').twbsPagination({
             totalPages: totalPage,

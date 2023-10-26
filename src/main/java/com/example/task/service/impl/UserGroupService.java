@@ -1,23 +1,32 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.UserGroupDTO;
+import com.example.task.entity.UserGroupEntity;
 import com.example.task.repository.UserGroupRepository;
 import com.example.task.service.IUserGroupService;
+import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.UserGroupTransformer;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UserGroupService extends BaseService implements IUserGroupService {
+public class UserGroupService extends BaseService<UserGroupDTO, UserGroupEntity,UserGroupRepository> implements IUserGroupService {
+
     @Autowired
     private UserGroupRepository userGroupRepository;
     @Autowired
     private UserGroupTransformer userGroupTransformer;
+
+    public UserGroupService(UserGroupRepository repo, CommonTransformer<UserGroupDTO, UserGroupEntity> transformer, EntityManager em) {
+        super(repo, transformer, em);
+    }
 
 
     @Override
@@ -27,7 +36,14 @@ public class UserGroupService extends BaseService implements IUserGroupService {
 
     @Override
     public UserGroupDTO save(UserGroupDTO userGroupDTO) {
-        return userGroupTransformer.toDto(userGroupRepository.save(userGroupTransformer.toEntity(userGroupDTO)));
+        if (userGroupDTO.getUserIds().length == 0) {
+            return userGroupTransformer.toDto(userGroupRepository.save(userGroupTransformer.toEntity(userGroupDTO)));
+        }
+        for (Long userId : userGroupDTO.getUserIds()) {
+            userGroupDTO.setUserId(userId);
+            userGroupRepository.save(userGroupTransformer.toEntity(userGroupDTO));
+        }
+        return userGroupDTO;
     }
 
     @Override
@@ -48,44 +64,23 @@ public class UserGroupService extends BaseService implements IUserGroupService {
     }
 
     @Override
-    public void deleteByPermissionId(Long permissionId) {
-        userGroupRepository.deleteByPermissionId(permissionId);
-    }
-
-    @Override
     public void deleteByGroupId(Long groupId) {
         userGroupRepository.deleteByGroupId(groupId);
     }
 
     @Override
-    public void save(Long groupId, Long[] userId, Long[] permissionId) {
+    public void save(Long groupId, Long[] userId) {
         UserGroupDTO userGroupDTO = new UserGroupDTO();
         userGroupDTO.setGroupId(groupId);
-        for (int i = 0; i < userId.length; i++) {
-            for (int j = 0; j < permissionId.length; j++) {
-                userGroupDTO.setUserId(userId[i]);
-                userGroupDTO.setPermissionId(permissionId[j]);
-                userGroupRepository.save(userGroupTransformer.toEntity(userGroupDTO));
-            }
+        for (Long id : userId) {
+            userGroupDTO.setUserId(id);
+            userGroupRepository.save(userGroupTransformer.toEntity(userGroupDTO));
         }
     }
 
     @Override
     public List<UserGroupDTO> findByGroupId(Long groupId) {
         return userGroupRepository.findAllByGroupId(groupId).stream()
-                .map(userGroupTransformer::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<UserGroupDTO> findAllPage(Pageable pageable) {
-        return userGroupRepository.findAll(pageable)
-                .map(userGroupTransformer::toDto);
-    }
-
-    @Override
-    public List<UserGroupDTO> findAll(Pageable pageable) {
-        return userGroupRepository.findAll(pageable).stream()
                 .map(userGroupTransformer::toDto)
                 .collect(Collectors.toList());
     }

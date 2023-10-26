@@ -1,35 +1,33 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.CommentDTO;
+import com.example.task.entity.CommentEntity;
 import com.example.task.repository.CommentRepository;
 import com.example.task.repository.UserRepository;
 import com.example.task.repository.projection.CommentProjection;
 import com.example.task.service.ICommentService;
 import com.example.task.transformer.CommentTransformer;
+import com.example.task.transformer.CommonTransformer;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CommentService extends BaseService implements ICommentService {
+public class CommentService extends BaseService<CommentDTO, CommentEntity, CommentRepository> implements ICommentService {
+
     @Autowired
     private CommentRepository commentRepository;
-    @Autowired
-    private UserRepository userRepository;
+
     @Autowired
     private CommentTransformer commentTransformer;
 
-    @Override
-    public List<CommentDTO> findAll() {
-        return null;
-    }
-
-    @Override
-    public List<CommentDTO> findAll(Pageable pageable) {
-        return null;
+    public CommentService(CommentRepository repo, CommonTransformer<CommentDTO, CommentEntity> transformer, EntityManager em) {
+        super(repo, transformer, em);
     }
 
     @Override
@@ -39,7 +37,7 @@ public class CommentService extends BaseService implements ICommentService {
 
     @Override
     public CommentDTO update(CommentDTO commentDTO) {
-        return null;
+        return commentTransformer.toDto(commentRepository.save(commentTransformer.toEntity(commentDTO)));
     }
 
     @Override

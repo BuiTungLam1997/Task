@@ -66,7 +66,7 @@
                     <b class="arrow"></b>
                 </li>
                 <li>
-                    <a href='<c:url value="/admin-permission-list?page=1&limit=4"/>'>
+                    <a href='<c:url value="/admin-permission-list"/>'>
                         <i class="menu-icon fa fa-caret-right"></i>
                         Danh sách quyền hạn
                     </a>
