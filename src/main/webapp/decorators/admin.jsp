@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/template/admin/font-awesome/4.5.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="/template/admin/assets/css/ace.min.css" class="ace-main-stylesheet"
           id="main-ace-style"/>
+    <link rel="stylesheet" href="/template/admin/css/menu.css">
     <script src="/template/admin/assets/js/ace-extra.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -25,6 +26,13 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="/template/paging/jquery.twbsPagination.js"></script>
+<%--  css  js wseetalert  --%>
+    <link rel="stylesheet" href="/template/admin/sweetalert/sweetalert2.min.css">
+    <script src="/template/admin/sweetalert/sweetalert2.min.js"></script>
+<%--  CSS COMMENT  --%>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/template/comment/style.css">
+    <link rel="stylesheet" href="/template/admin/css/dropdown.css">
 </head>
 <body class="no-skin">
 <!-- header -->
