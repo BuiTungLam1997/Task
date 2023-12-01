@@ -71,59 +71,16 @@ public class TaskControllerUser {
                                        @RequestParam(value = "page", required = false) Integer page,
                                        @RequestParam(value = "limit", required = false) Integer limit,
                                        @RequestParam(value = "message", required = false) String message) {
-        ModelAndView mav = new ModelAndView("/user/list-assign");
-        String username = SecurityUtils.getPrincipal().getUsername();
-        if (page == null || limit == null) {
-            page = 1;
-            limit = 4;
-        }
-        Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<TaskDTO> resultPage = taskService.findAllByUsername(pageable, username);
-        taskDTO.setPage(page);
-        taskDTO.setLimit(limit);
-        taskDTO.setListResult(resultPage.getContent());
-        taskDTO.setTotalItem(taskService.getTotalItemByUsername(username));
-        taskDTO.setTotalPage((int) Math.ceil((double) (taskDTO.getTotalItem()) / taskDTO.getLimit()));
-        mav.addObject("model", taskDTO);
-
-        if (message != null) {
-            Map<String, String> result = messageUtils.getMessage(message);
-            mav.addObject("messageResponse", result.get("message"));
-            mav.addObject("alert", result.get("alert"));
-        }
-        return mav;
+        return new ModelAndView("/user/list-assign");
     }
 
     @GetMapping(value = "/user-search-task")
-    public ModelAndView searchTask(@RequestParam(required = false) String search,
-                                   @RequestParam(required = false) String searchTws,
-                                   @RequestParam(required = false, defaultValue = "" + defaultPage + "") Integer page,
-                                   @RequestParam(required = false, defaultValue = "" + defaultLimit + "") Integer limit,
-                                   @RequestParam(required = false) String message) {
+    public ModelAndView searchTask(@RequestParam(required = false) String search) {
         if (Objects.equals(search, "")) {
             return new ModelAndView("redirect:/user-task-list");
         }
-
-        TaskDTO taskDTO = new TaskDTO();
-        Pageable pageable = PageRequest.of(page - 1, limit);
-        if (search == null) {
-            search = searchTws;
-        }
-
-        Page<TaskDTO> pageResult = taskService.queryExample(pageable, search);
-        taskDTO.setPage(page);
-        taskDTO.setLimit(limit);
-        taskDTO.setTotalPage(pageResult.getTotalPages());
-        taskDTO.setTotalItem((int) pageResult.getTotalElements());
-        taskDTO.setSearchResponse(search);
-        taskDTO.setListResult(pageResult.getContent());
-
         ModelAndView mav = new ModelAndView("user/search");
-        if (message != null) {
-            addMessage(mav, message);
-        }
-
-        mav.addObject(model, taskDTO);
+        mav.addObject("searchResponse", search);
         return mav;
     }
 

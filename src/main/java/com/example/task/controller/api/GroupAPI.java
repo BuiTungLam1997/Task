@@ -39,11 +39,12 @@ public class GroupAPI extends CommonAPI {
         responseService.setMessage("Insert succsess");
         try {
             groupService.save(groupDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 
     @PutMapping()
@@ -51,11 +52,12 @@ public class GroupAPI extends CommonAPI {
         responseService.setMessage("Update success");
         try {
             groupService.update(groupDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 
     @DeleteMapping
@@ -63,10 +65,11 @@ public class GroupAPI extends CommonAPI {
         responseService.setMessage("Delete success");
         try {
             groupService.delete(groupDTO.getIds());
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 }

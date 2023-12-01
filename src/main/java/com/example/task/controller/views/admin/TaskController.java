@@ -6,14 +6,11 @@ import com.example.task.dto.UserDTO;
 import com.example.task.dto.constant.StatusMessage;
 import com.example.task.dto.constant.StatusTask;
 import com.example.task.dto.constant.SystemConstant;
-import com.example.task.mail.SendEmailService;
 import com.example.task.service.IEmailService;
 import com.example.task.service.ITaskService;
 import com.example.task.service.IUserService;
-import com.example.task.service.filterQBE.FilterTask;
 import com.example.task.utils.MessageUtils;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -70,17 +67,7 @@ public class TaskController {
     public ModelAndView newsEdit(@RequestParam(value = "id", required = false) Long id,
                                  @RequestParam(value = "message", required = false) String message) {
         ModelAndView mav = new ModelAndView("/admin/task/edit");
-        Optional<TaskDTO> taskDTO;
-
-        taskDTO = (id != null) ? taskService.findById(id) : Optional.empty();
-        TaskDTO task = taskDTO.orElseThrow(NullPointerException::new);
-        task.setLevelOfDifficulty((task.getPoint() != null) ? unFibonaci(task.getPoint()) : 0);
-        mav.addObject(model, task);
-
-        if (message != null) {
-            addMessage(mav, message);
-        }
-
+        mav.addObject("id", id);
         return mav;
     }
 
@@ -89,13 +76,10 @@ public class TaskController {
 
     @GetMapping(value = "/admin-task-giveAJob")
     public ModelAndView giveAJob(@RequestParam(value = "id", required = false) Long id) {
-        Optional<TaskDTO> taskDTO = taskService.findById(id);
         ModelAndView mav = new ModelAndView(JOB);
-        if (taskDTO.isPresent()) {
-            TaskDTO task = taskDTO.get();
-            task.setListUsername(userService.findAllUsername());
-            mav.addObject(model, task);
-        }
+        List<String> username = userService.findAllUsername();
+        mav.addObject("id", id);
+        mav.addObject("listUsername", username);
         return mav;
     }
 
@@ -127,8 +111,8 @@ public class TaskController {
     }
 
     private void saveEmail(TaskDTO taskDTO) {
-        UserDTO userDTO = userService.findByUsername(taskDTO.getPerformer());
-        String to = userDTO != null ? userDTO.getEmail() : userService.getMailDefault();
+        Optional<UserDTO> userDTO = userService.findByUsername(taskDTO.getPerformer());
+        String to = userDTO.isPresent() ? userDTO.get().getEmail() : userService.getMailDefault();
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setToEmail(to);
         emailDTO.setTitle(taskDTO.getTitle());
@@ -146,27 +130,12 @@ public class TaskController {
         if (Objects.equals(search, "")) {
             return new ModelAndView("redirect:/admin-task-list");
         }
-
-        TaskDTO taskDTO = new TaskDTO();
-        Pageable pageable = PageRequest.of(page - 1, limit);
-        if (search == null) {
-            search = searchTws;
-        }
-
-        Page<TaskDTO> pageResult = taskService.queryExample(pageable, search);
-        taskDTO.setPage(page);
-        taskDTO.setLimit(limit);
-        taskDTO.setTotalPage(pageResult.getTotalPages());
-        taskDTO.setTotalItem((int) pageResult.getTotalElements());
-        taskDTO.setSearchResponse(search);
-        taskDTO.setListResult(pageResult.getContent());
-
         ModelAndView mav = new ModelAndView("/admin/task/search");
         if (message != null) {
             addMessage(mav, message);
         }
 
-        mav.addObject(model, taskDTO);
+        mav.addObject("searchResponse", search);
         return mav;
     }
 

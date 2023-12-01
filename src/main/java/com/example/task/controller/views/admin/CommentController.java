@@ -45,8 +45,8 @@ public class CommentController {
         task.setLevelOfDifficulty(unFibonaci(task.getPoint()));
         mav.addObject("modelTask", task);
 
-        UserDTO userDTO = userService.findByUsername(task.getPerformer());
-        if (userDTO != null) {
+        Optional<UserDTO> userDTO = userService.findByUsername(task.getPerformer());
+        if (userDTO.isPresent()) {
             mav.addObject("modelUser", userDTO);
         }
 

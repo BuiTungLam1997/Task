@@ -59,11 +59,7 @@
             <div class="row">
                 <div class="col-xs-12">
                     <!-- PAGE CONTENT BEGINS -->
-                    <c:if test="${not empty MESSAGE}">
-                        <div class="alert alert-${ALERT}">
-                                ${MESSAGE}
-                        </div>
-                    </c:if>
+                    <div id="message"></div>
                     <form:form action="/admin-change-password-edit" class="form-horizontal" role="form" id="formSubmit"
                                modelAttribute="model"
                                method="get">
@@ -104,7 +100,7 @@
                         <div class="space-4"></div>
                         <div class="clearfix form-actions">
                             <div class="col-md-offset-3 col-md-9">
-                                <button class="btn btn-info" type="submit" id="btnSubmit">
+                                <button class="btn btn-info" type="button" id="btnChange">
                                     <i class="ace-icon fa fa-check bigger-110"></i>
                                     Submit
                                 </button>
@@ -123,5 +119,6 @@
         $(this).alert('close');
     });
 </script>
+<script type='text/javascript' src="/template/custom/admin/js/user/change.js"></script>
 </body>
 </html>

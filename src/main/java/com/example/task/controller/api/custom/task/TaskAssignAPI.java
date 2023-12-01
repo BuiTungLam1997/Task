@@ -9,6 +9,7 @@ import com.example.task.dto.constant.StatusTask;
 import com.example.task.service.IEmailService;
 import com.example.task.service.ITaskService;
 import com.example.task.service.IUserService;
+import com.example.task.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,11 +60,12 @@ public class TaskAssignAPI extends CommonAPI {
             TaskDTO task = taskService.findById(taskDTO.getId()).orElseThrow(NullPointerException::new);
             task.setPoint(point);
             taskService.update(task);
+            return new ResponseEntity<>(new ResponseService(taskService.findById(taskDTO.getId()), "200"), HttpStatus.OK);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseService(taskService.findById(taskDTO.getId()), "200"), HttpStatus.OK);
+
     }
 
     @PutMapping()
@@ -74,22 +76,53 @@ public class TaskAssignAPI extends CommonAPI {
             EmailDTO email = new EmailDTO();
             setEmail(taskOld, taskDTO, email);
             if (taskDTO.getStatus().equals(StatusTask.DONE)) {
-                UserDTO user = userService.findByUsername(taskDTO.getPerformer());
+                UserDTO user = userService.findByUsername(taskDTO.getPerformer()).orElseThrow(NullPointerException::new);
                 int totalPoint = user.getTotalPoint() + taskDTO.getPoint();
                 user.setTotalPoint(totalPoint);
                 userService.update(user);
             }
             taskService.update(taskDTO);
-
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+    }
+
+    @GetMapping(value = "/list-assign")
+    public ResponseEntity<ResponseService> listAssign(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "limit", required = false) Integer limit) {
+        responseService.setMessage("Success");
+        try {
+            String username = SecurityUtils.getPrincipal().getUsername();
+            Pageable pageable = PageRequest.of(page - 1, limit);
+            Page<TaskDTO> resultPage = taskService.findAllByUsername(pageable, username);
+            return new ResponseEntity<>(new ResponseService("Success", resultPage.getContent(),
+                    resultPage.getTotalPages(), page, limit, "200"), HttpStatus.OK);
+        } catch (Exception ex) {
+            responseService.setMessage(ex.getMessage());
+            return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(value = "/search/{search}")
+    public ResponseEntity<ResponseService> search(@PathVariable String search,
+                                                  @RequestParam(value = "page", required = false) Integer page,
+                                                  @RequestParam(value = "limit", required = false) Integer limit) {
+        responseService.setMessage("Success");
+        try {
+            Pageable pageable = PageRequest.of(page - 1, limit);
+            Page<TaskDTO> task = taskService.searchTask(pageable, search);
+            return new ResponseEntity<>(new ResponseService("Success", task.getContent(), task.getTotalPages(), page, limit, "200"), HttpStatus.OK);
+        } catch (Exception ex) {
+            responseService.setMessage(ex.getMessage());
+            return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
+        }
     }
 
     private String getEmailByUsername(String username) {
-        return userService.findByUsername(username).getEmail();
+        return userService.findByUsername(username).orElseThrow(NullPointerException::new).getEmail();
 
     }
 

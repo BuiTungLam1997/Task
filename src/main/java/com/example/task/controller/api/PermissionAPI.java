@@ -24,9 +24,14 @@ public class PermissionAPI extends CommonAPI {
     public ResponseEntity<ResponseService> listPermission(@RequestParam(required = false, defaultValue = "" + defaultPage + "") Integer page,
                                                           @RequestParam(required = false, defaultValue = "" + defaultLimit + "") Integer limit) {
 
-        Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<PermissionDTO> pageResult = permissionService.query(pageable);
-        return new ResponseEntity<>(new ResponseService("success", pageResult.getContent(), pageResult.getTotalPages(), page,  limit,"200"), HttpStatus.OK);
+        try {
+            Pageable pageable = PageRequest.of(page - 1, limit);
+            Page<PermissionDTO> pageResult = permissionService.query(pageable);
+            return new ResponseEntity<>(new ResponseService("success", pageResult.getContent(), pageResult.getTotalPages(), page, limit, "200"), HttpStatus.OK);
+        } catch (Exception ex) {
+            responseService.setMessage(ex.getMessage());
+            return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping
@@ -34,11 +39,12 @@ public class PermissionAPI extends CommonAPI {
         responseService.setMessage("Insert success");
         try {
             permissionService.save(permissionDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 
 
@@ -47,11 +53,12 @@ public class PermissionAPI extends CommonAPI {
         responseService.setMessage("Update success");
         try {
             permissionService.update(permissionDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 
     @DeleteMapping
@@ -59,10 +66,11 @@ public class PermissionAPI extends CommonAPI {
         responseService.setMessage("Delete Success");
         try {
             permissionService.delete(permissionDTO.getIds());
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 }

@@ -38,6 +38,11 @@ public class ResponseService {
         this.status = status;
     }
 
+    public ResponseService(String message, Object data) {
+        this.message = message;
+        this.data = data;
+    }
+
     public ResponseService(String message, String status) {
         this.message = message;
         this.status = status;

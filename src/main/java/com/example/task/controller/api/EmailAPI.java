@@ -19,11 +19,12 @@ public class EmailAPI extends CommonAPI {
         responseService.setMessage("Insert success");
         try {
             emailService.save(emailDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 
     @PutMapping
@@ -31,10 +32,11 @@ public class EmailAPI extends CommonAPI {
         responseService.setMessage("Update success");
         try {
             emailService.update(emailDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 }

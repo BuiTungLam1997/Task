@@ -119,12 +119,6 @@
     <ul class="pagination" id="pagination"></ul>
 </div>
 </div>
-<script>
-    $('#btnPeriod').click(function (e) {
-        let period = document.getElementById('period').value;
-    });
-
-</script>
-<script type='text/javascript' src="/template/custom/admin/js/report.js"></script>
+<script type='text/javascript' src="/template/custom/admin/js/user/report.js"></script>
 </body>
 </html>

@@ -31,11 +31,8 @@ To change this template use File | Settings | File Templates.
         <div class="page-content">
             <div class="row">
                 <div class="col-xs-12">
-                    <c:if test="${not empty MESSAGE}">
-                        <div class="alert alert-${ALERT}">
-                                ${MESSAGE}
-                        </div>
-                    </c:if>
+                    <div id="message">
+                    </div>
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="table-responsive">
@@ -88,49 +85,14 @@ To change this template use File | Settings | File Templates.
                                             <th>Thao tác</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
-                                        <c:forEach var="item" items="${model.listResult}">
-                                            <tr>
-                                                <td><input type="checkbox" id="checkbox_${item.id}"
-                                                           value="${item.id}">
-                                                </td>
-                                                <td>${item.title}</td>
-                                                <td>${item.content}</td>
-                                                <td>${item.performer}</td>
-                                                <td>${item.deadlineEnd}</td>
-                                                <td>${item.status}</td>
-                                                <td>
-                                                    <c:url var="updateTaskURL" value="/admin-task-edit">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                    </c:url>
-                                                    <c:url var="TaskCommentURL" value="/comment">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                    </c:url>
-                                                    <c:url var="giveAJob" value="/admin-task-giveAJob">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                        <c:param name="performer" value="${item.performer}"/>
-                                                    </c:url>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Cập nhật bài viết" href='${updateTaskURL}'>
-                                                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Comment" href='${TaskCommentURL}'>
-                                                        <i class="fa fa-fw fa-comment" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Giao công việc" href='${giveAJob}'>
-                                                        <i class="fa fa-fw fa-paper-plane-o" aria-hidden="true"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
+                                        <tbody id="listTask">
                                         </tbody>
                                     </table>
                                     <input type="hidden" value="" id="page" name="page">
                                     <input type="hidden" value="" id="limit" name="limit">
-                                    <input type="hidden" value="" id="searchTws" class="searchTws"
-                                           name="searchTws">
+                                    <input type="hidden" value="${searchResponse}" id="searchResponse"
+                                           class="searchResponse"
+                                           name="searchResponse">
                                     <ul class="pagination" id="pagination"></ul>
                                 </form>
                             </div>
@@ -141,79 +103,7 @@ To change this template use File | Settings | File Templates.
         </div>
     </div>
 </div><!-- /.main-content -->
-<script type="text/javascript">
-    var totalPage = ${model.totalPage};
-    var currentPage = ${model.page};
-    var limit = 4;
-    var searchResponse = '${model.searchResponse}';
-    $(function () {
-        window.pagObj = $('#pagination').twbsPagination({
-            totalPages: totalPage,
-            visiblePages: limit,
-            startPage: currentPage,
-            onPageClick: function (event, page) {
-                if (currentPage != page) {
-                    $('#limit').val(limit);
-                    $('#page').val(page);
-                    if (document.forms["formSearch"]["search"].value === "") {
-                        $('#searchTws').val(searchResponse);
-                    } else {
-                        var x = document.getElementById("search").value;
-                        $('#searchTws').val(x);
-                    }
-                    $('#formSubmit').submit();
-                }
-            }
-        });
-    });
-    $(".alert").delay(2000).slideUp(200, function () {
-        $(this).alert('close');
-    });
-
-    function fun() {
-        $('#search').val();
-        $('#btnSearch').submit();
-    }
-
-    function warningBeforeDelete() {
-        swal({
-            title: "Mài có chắc chắn xóa nó không ?",
-            text: "Thấy câu hỏi ở trên không ,ừ chỗ này giống nó đó ,trả lời đi!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonClass: "btn-success",
-            cancelButtonClass: "btn-danger",
-            confirmButtonText: "Có, Con đồng ý xóa thưa ngài!",
-            cancelButtonText: "Không , Con cần thời gian suy nghĩ!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }).then(function (isConfirm) {
-            if (isConfirm) {
-                var data = {};
-                var dataArray = $('tbody input[type=checkbox]:checked').map(function () {
-                    return $(this).val();
-                }).get();
-                data ['ids'] = dataArray;
-                deleteDevice(data);
-            }
-        });
-    }
-
-    function deleteDevice(data) {
-        $.ajax({
-            url: '${APIurl}',
-            type: 'DELETE',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                window.location.href = '${TaskURL}&message=delete_success';
-            },
-            error: function (error) {
-                window.location.href = '${TaskURL}&message=error_system';
-            },
-        });
-    }
-</script>
+<script type='text/javascript' src="/template/custom/admin/js/task/search.js"></script>
 </body>
 </html>
 

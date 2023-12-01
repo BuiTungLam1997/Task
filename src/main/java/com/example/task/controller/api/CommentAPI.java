@@ -21,7 +21,6 @@ import java.util.Optional;
 public class CommentAPI extends CommonAPI {
 
     private ICommentService commentService;
-
     private IUserService userService;
 
     @GetMapping(value = "/{taskId}")
@@ -30,25 +29,25 @@ public class CommentAPI extends CommonAPI {
         List<CommentDTO> commentDTOS;
         try {
             commentDTOS = commentService.findByTaskId(taskId);
+            return new ResponseEntity<>(new ResponseService(commentDTOS, "200"), HttpStatus.OK);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseService(commentDTOS, "200"), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ResponseService> insertComment(@RequestBody CommentDTO commentDTO) {
         responseService.setMessage("Insert success");
         try {
-            UserDTO user = userService.findByUsername(commentDTO.getUsername());
+            UserDTO user = userService.findByUsername(commentDTO.getUsername()).orElseThrow(NullPointerException::new);
             commentDTO.setUserId(user.getId());
             commentDTO = commentService.save(commentDTO);
+            return new ResponseEntity<>(new ResponseService(commentDTO, "200"), HttpStatus.OK);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseService(commentDTO, "200"), HttpStatus.OK);
     }
 
 
@@ -57,11 +56,11 @@ public class CommentAPI extends CommonAPI {
         responseService.setMessage("Update success");
         try {
             commentService.update(commentDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
     }
 
     @DeleteMapping
@@ -69,10 +68,10 @@ public class CommentAPI extends CommonAPI {
         responseService.setMessage("Delete success");
         try {
             commentService.delete(commentDTO.getIds());
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
     }
 }

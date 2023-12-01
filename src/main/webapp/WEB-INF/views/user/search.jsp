@@ -31,18 +31,14 @@ To change this template use File | Settings | File Templates.
         <div class="page-content">
             <div class="row">
                 <div class="col-xs-12">
-                    <c:if test="${not empty MESSAGE}">
-                        <div class="alert alert-${ALERT}">
-                                ${MESSAGE}
-                        </div>
-                    </c:if>
+                    <div id="message"></div>
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="table-responsive">
                                 <form name="formSearch" action="<c:url value="/user-search-task"/>" method="get"
                                       id="formSearch">
                                     <input type="text" placeholder="Search.." name="search" id="search" value="">
-                                    <button type="submit" onclick="fun()" id="btnSearch">Submit
+                                    <button type="button" id="btnSearch">Submit
                                     </button>
                                 </form>
                                 <div class="dropdown">
@@ -57,7 +53,7 @@ To change this template use File | Settings | File Templates.
                                 <form action="<c:url value="/user-search-task"/>" id="formSubmit" method="get">
                                     <div class="pull-right tableTools-container">
                                         <div class="dt-buttons btn-overlap btn-group">
-                                            <button id="btnFollow" type="button" onclick="clickFunction()"
+                                            <button id="btnFollow" type="button"
                                                     class="dt-button buttons-html5 btn btn-white btn-primary btn-bold"
                                                     data-toggle="tooltip" title='Xóa bài viết'>
 																<span>
@@ -94,8 +90,8 @@ To change this template use File | Settings | File Templates.
                                     </table>
                                     <input type="hidden" value="" id="page" name="page">
                                     <input type="hidden" value="" id="limit" name="limit">
-                                    <input type="hidden" value="" id="searchTws" class="searchTws"
-                                           name="searchTws">
+                                    <input type="hidden" value="${searchResponse}" id="searchResponse"
+                                           name="searchResponse">
                                     <ul class="pagination" id="pagination"></ul>
                                 </form>
                             </div>
@@ -106,92 +102,6 @@ To change this template use File | Settings | File Templates.
         </div>
     </div>
 </div><!-- /.main-content -->
-<script type="text/javascript">
-    var totalPage = ${model.totalPage};
-    var currentPage = ${model.page};
-    var limit =  ${model.limit};
-    $(function () {
-        window.pagObj = $('#pagination').twbsPagination({
-            totalPages: totalPage,
-            visiblePages: limit,
-            startPage: currentPage,
-            onPageClick: function (event, page) {
-                if (currentPage !== page) {
-                    $('#limit').val(limit);
-                    $('#page').val(page);
-                    $('#formSubmit').submit();
-                }
-            }
-        });
-    });
-    $(".alert").delay(2000).slideUp(200, function () {
-        $(this).alert('close');
-    });
-
-    function fun() {
-        $('#search').val();
-        $('#btnSearch').submit();
-    }
-
-    function warningBeforeDelete() {
-        swal({
-            title: "Mài có chắc chắn xóa nó không ?",
-            text: "Thấy câu hỏi ở trên không ,ừ chỗ này giống nó đó ,trả lời đi!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonClass: "btn-success",
-            cancelButtonClass: "btn-danger",
-            confirmButtonText: "Có, Con đồng ý xóa thưa ngài!",
-            cancelButtonText: "Không , Con cần thời gian suy nghĩ!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }).then(function (isConfirm) {
-            if (isConfirm) {
-                var data = {};
-                var dataArray = $('tbody input[type=checkbox]:checked').map(function () {
-                    return $(this).val();
-                }).get();
-                data ['ids'] = dataArray;
-                deleteDevice(data);
-            }
-        });
-    }
-
-    function deleteDevice(data) {
-        $.ajax({
-            url: '${APIurl}',
-            type: 'DELETE',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                window.location.href = '${UserTaskURL}&message=delete_success';
-            },
-            error: function (error) {
-                window.location.href = '${UserTaskURL}&message=error_system';
-            },
-        });
-    }
-
-    clickFunction = () => {
-        let data = {};
-        data ['taskIds'] = $('tbody input[type=checkbox]:checked').map(function () {
-            return $(this).val();
-        }).get();
-        $.ajax({
-            url: `/api/task-follow/create`,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                window.location.href = '${UserTaskURL}&message=insert_success';
-            },
-            error: function (error) {
-                window.location.href = '${UserTaskURL}&message=error_system';
-            },
-
-        });
-    }
-</script>
 </body>
 </html>
 

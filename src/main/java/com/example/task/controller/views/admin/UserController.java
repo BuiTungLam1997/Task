@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,46 +38,18 @@ public class UserController {
 
     @GetMapping(value = {"/admin-user-list"})
 
-    public ModelAndView homeUserList(@ModelAttribute("model") UserDTO userDTO,
-                                     @RequestParam(value = "page", required = false) Integer page,
-                                     @RequestParam(value = "limit", required = false) Integer limit,
-                                     @RequestParam(value = "message", required = false) String message) {
+    public ModelAndView homeUserList() {
         ModelAndView mav = new ModelAndView("/admin/user/list");
-        if ((page == null || limit == null)) {
-            page = defaultPage;
-            limit = defaultLimit;
-        }
-        Pageable pageable = PageRequest.of(page - 1, limit);
-
-        Page<UserDTO> pageResult = userService.query(pageable);
-        userDTO.setPage(page);
-        userDTO.setLimit(limit);
-        userDTO.setListResult(pageResult.getContent());
-        userDTO.setTotalItem((int) pageResult.getTotalElements());
-        userDTO.setTotalPage(pageResult.getTotalPages());
-
-        if (message != null) {
-            addMessage(mav, message);
-        }
-        GroupDTO groupDTO = new GroupDTO();
-        groupDTO.setListResult(groupService.findAll());
-        mav.addObject("modelGroup", groupDTO);
-        mav.addObject(model, userDTO);
+        List<GroupDTO> listGroup = groupService.findAll();
+        mav.addObject("listGroup", listGroup);
         return mav;
     }
 
     @GetMapping(value = "/admin-user-edit")
-    public ModelAndView newsEdit(@RequestParam(value = "id", required = false) Long id,
-                                 @RequestParam(value = "message", required = false) String message) {
+    public ModelAndView newsEdit(@RequestParam(value = "id", required = false) Long id) {
 
         ModelAndView mav = new ModelAndView("/admin/user/edit");
-        Optional<UserDTO> userDTO;
-        userDTO = (id != null) ? userService.findById(id) : Optional.empty();
-        UserDTO user = userDTO.orElseThrow(NullPointerException::new);
-        mav.addObject(model, user);
-        if (message != null) {
-            addMessage(mav, message);
-        }
+        mav.addObject("id", id);
         return mav;
     }
 
@@ -86,60 +59,21 @@ public class UserController {
     }
 
     @GetMapping(value = "/admin-change-password-edit")
-    public ModelAndView changePasswordEdit(@RequestParam(value = "id", required = false) Long id,
-                                           @ModelAttribute("model") UserDTO userDTO) {
-        ModelAndView mav = new ModelAndView("/admin/user/change");
-        if (!checkPassword(userDTO)) {
-            String message = "Mật khẩu bạn vừa nhập không đúng ,mười bạn nhập lại";
-            String alert = "danger";
-            mav.addObject(String.valueOf(MESSAGE), message);
-            mav.addObject(String.valueOf(ALERT), alert);
-            return mav;
-        }
-        if (!checkPasswordNewAndRetype(userDTO)) {
-            String message = "Mật khẩu bạn vừa nhập lại không đúng ,mười bạn nhập lại";
-            String alert = "danger";
-            mav.addObject(String.valueOf(MESSAGE), message);
-            mav.addObject(String.valueOf(ALERT), alert);
-            return mav;
-        }
-        userService.changePassword(userDTO);
-        mav.addObject(String.valueOf(MESSAGE), "Thay đổi thành công");
-        mav.addObject(String.valueOf(ALERT), "success");
-        return new ModelAndView("redirect:/dang-nhap");
+    public ModelAndView changePasswordEdit() {
+        return new ModelAndView("/admin/user/change");
     }
 
     @GetMapping(value = "/admin-search-user")
-    public ModelAndView searchTask(@RequestParam(value = "search", required = false) String search,
-                                   @RequestParam(value = "searchTws", required = false) String searchTws,
-                                   @RequestParam(value = "page", required = false) Integer page,
-                                   @RequestParam(value = "limit", required = false) Integer limit,
-                                   @RequestParam(value = "message", required = false) String message) {
+    public ModelAndView searchTask(
+            @RequestParam(value = "search", required = false) String search
+    ) {
         if (Objects.equals(search, "")) {
             return new ModelAndView("redirect:/admin-task-list");
         }
-        if (page == null || limit == null) {
-            page = defaultPage;
-            limit = defaultLimit;
-        }
-        Pageable pageable = PageRequest.of(page - 1, limit);
-
-        if (search.isEmpty()) {
-            search = searchTws;
-        }
-        Page<UserDTO> pageResult = userService.querySearch(search, pageable);
-
-        UserDTO userDTO = new UserDTO();
-        userDTO.setPage(page);
-        userDTO.setLimit(limit);
-        userDTO.setListResult(pageResult.getContent());
-
-        userDTO.setTotalItem((int) pageResult.getTotalElements());
-        userDTO.setTotalPage(pageResult.getTotalPages());
-        userDTO.setSearchResponse(search);
-
         ModelAndView mav = new ModelAndView("/admin/user/search");
-        mav.addObject(model, userDTO);
+        List<GroupDTO> listGroup = groupService.findAll();
+        mav.addObject("listGroup", listGroup);
+        mav.addObject("searchResponse", search);
         return mav;
     }
 
@@ -149,9 +83,9 @@ public class UserController {
     }
 
     private boolean checkPassword(UserDTO userDTO) {
-        UserDTO user = userService.findByUsername(userDTO.getUsername());
-        if (user != null) {
-            String pass = user.getPassword();
+        Optional<UserDTO> user = userService.findByUsername(userDTO.getUsername());
+        if (user.isPresent()) {
+            String pass = user.get().getPassword();
             return passwordEncoder.matches(userDTO.getPassword(), pass);
         }
         return false;

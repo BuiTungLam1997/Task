@@ -16,9 +16,6 @@ import java.util.Optional;
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class JpaAuditingConfig {
 
-    @Autowired
-    protected UserRepository userRepository;
-
     @Bean
     public AuditorAware<String> auditorProvider() {
         return new AuditorAwareImpl();

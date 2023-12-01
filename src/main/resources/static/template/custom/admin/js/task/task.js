@@ -9,15 +9,31 @@ jQuery(function ($) {
         if (!url) url = `/api/task/list`;
         $.ajax({
             url: url,
+            type: 'GET',
             contentType: 'application/json',
             dataType: 'json',
             success: function (result) {
                 mapTable(result.data);
                 paging(url, result.totalPages, result.currentPage, result.limit);
+                responseMessage(result.message);
             },
         });
     }
+    let responseMessage = (message, status) => {
+        let row = ``;
+        if (status === '200') {
+            row += `<div class="alert alert-success">`;
+            row += ` <a>message</a>`;
+            row += `</div>`;
+        } else if (status !== '200') {
+            row += `<div class="alert alert-danger">`;
+            row += `<a>${message}</a>`;
+            row += `</div>`;
+        }
+        $('#message').empty();
+        $('#message').append(row);
 
+    }
     let mapTable = (data) => {
         let row = '';
         $.each(data, function (i, v) {
@@ -31,7 +47,7 @@ jQuery(function ($) {
             row += `<td>${v.point}</td>`
             row += `<td>
             <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                       title="Cập nhật bài viết" href='/admin-task-edit?id=${v.id}'>
+                       title="Cập nhật bài viết" href='/admin-task-edit?id=${v.id}'>             
             <i class="fa fa-pencil-square-o" aria-hidden="true"/>
            </a>
            
@@ -69,7 +85,6 @@ jQuery(function ($) {
     $(".alert").delay(2000).slideUp(200, function () {
         $(this).alert('close');
     });
-
     $('#btnSearch').click(function (e) {
         $('#search').val();
         $('#btnSearch').submit();

@@ -32,11 +32,7 @@ To change this template use File | Settings | File Templates.
         <div class="page-content">
             <div class="row">
                 <div class="col-xs-12">
-                    <c:if test="${not empty MESSAGE}">
-                        <div class="alert alert-${ALERT}">
-                                ${MESSAGE}
-                        </div>
-                    </c:if>
+                    <div id="message"></div>
                     <div class="row">
                         <div class="col-xs-12">
                             <div class="table-responsive">
@@ -48,7 +44,7 @@ To change this template use File | Settings | File Templates.
 
                                 <form action="<c:url value="${APIUrl}"/>" method="put" id="formGroup">
                                     <select id="groupId" name="groupId">
-                                        <c:forEach var="item" items="${modelGroup.listResult}">
+                                        <c:forEach var="item" items="${listGroup}">
                                             <option value="${item.id}">${item.name}</option>
                                         </c:forEach>
                                     </select>
@@ -91,38 +87,7 @@ To change this template use File | Settings | File Templates.
                                             <th>Thao tác</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
-                                        <c:forEach var="item" items="${model.listResult}">
-                                            <tr>
-                                                <td><input type="checkbox" id="checkbox_${item.id}"
-                                                           value="${item.id}">
-                                                </td>
-                                                <td>${item.id}</td>
-                                                <td>${item.username}</td>
-                                                <td>${item.fullName}</td>
-                                                <td>${item.status}</td>
-                                                <td>${item.createdDate}</td>
-                                                <td>${item.createdBy}</td>
-                                                <td>${item.email}</td>
-                                                <td>
-                                                    <c:url var="updateUserURL" value="/admin-user-edit">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                    </c:url>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Cập nhật user" href='${updateUserURL}'><i
-                                                            class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                                    </a>
-                                                    <c:url var="reportUser" value="/admin-report-user">
-                                                        <c:param name="id" value="${item.id}"/>
-                                                    </c:url>
-                                                    <a class="btn btn-sm btn-primary btn-edit" data-toggle="tooltip"
-                                                       title="Báo cáo công việc user" href='${reportUser}'>
-                                                        <i class="fa fa-clipboard" aria-hidden="true"></i>
-                                                    </a>
-
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
+                                        <tbody id="listUser">
                                         </tbody>
                                     </table>
                                     <ul class="pagination" id="pagination"></ul>
@@ -137,102 +102,7 @@ To change this template use File | Settings | File Templates.
         </div>
     </div>
 </div><!-- /.main-content -->
-<script type="text/javascript">
-    var totalPage = ${model.totalPage};
-    var currentPage = ${model.page};
-    var limit = 4
-    $(function () {
-        window.pagObj = $('#pagination').twbsPagination({
-            totalPages: totalPage,
-            visiblePages: limit,
-            startPage: currentPage,
-            onPageClick: function (event, page) {
-                if (currentPage != page) {
-                    $('#limit').val(limit);
-                    $('#page').val(page);
-                    $('#formSubmit').submit();
-                }
-            }
-        });
-    });
-    $(".alert").delay(2000).slideUp(200, function () {
-        $(this).alert('close');
-    });
-
-    $('#btnAdd').click(function (e) {
-        e.preventDefault();
-        const formData = $('#formGroup').serializeArray();
-        const data = {};
-        $.each(formData, function (i, v) {
-            data["" + v.name + ""] = v.value;
-        });
-        const dataArray = $('tbody input[type=checkbox]:checked').map(function () {
-            return $(this).val();
-        }).get();
-        data ['userIds'] = dataArray;
-        addGroup(data);
-
-    });
-
-    function fun() {
-        $('#search').val();
-        $('#btnSearch').submit();
-    }
-
-    function warningBeforeDelete() {
-        swal({
-            title: "Mài có chắc chắn xóa nó không ?",
-            text: "Thấy câu hỏi ở trên không ,ừ chỗ này giống nó đó ,trả lời đi!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonClass: "btn-success",
-            cancelButtonClass: "btn-danger",
-            confirmButtonText: "Có, Con đồng ý xóa thưa ngài!",
-            cancelButtonText: "Không , Con cần thời gian suy nghĩ!",
-            closeOnConfirm: false,
-            closeOnCancel: false
-        }).then(function (isConfirm) {
-            if (isConfirm) {
-                var data = {};
-                var dataArray = $('tbody input[type=checkbox]:checked').map(function () {
-                    return $(this).val();
-                }).get();
-                data ['ids'] = dataArray;
-                deleteDevice(data);
-            }
-        });
-    }
-
-    function deleteDevice(data) {
-        $.ajax({
-            url: '${APIUrl}',
-            type: 'DELETE',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                window.location.href = '${UserURL}&message=delete_success';
-            },
-            error: function (error) {
-                window.location.href = '${UserURL}&message=error_system';
-            },
-        });
-    }
-
-    function addGroup(data) {
-        $.ajax({
-            url: '${UserGroupAPIUrl}',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function (result) {
-                window.location.href = '${UserURL}&message=insert_success';
-            },
-            error: function (error) {
-                window.location.href = '${UserURL}&message=error_system';
-            },
-        });
-    }
-</script>
+<script type='text/javascript' src="/template/custom/admin/js/user/list.js"></script>
 </body>
 </html>
 

@@ -18,17 +18,9 @@ public class HomeController {
 
     @GetMapping(value = {"/user-home"})
     public ModelAndView homePage() {
-        String username = SecurityUtils.getPrincipal().getUsername();
-        UserDTO userDTO = userService.findByUsername(username);
-
-        if (userDTO != null) {
-            UserDTO user = userDTO;
-            user.setListPermission(userService.getListPermission(username));
-            ModelAndView mav = new ModelAndView("user/home");
-            mav.addObject("model", user);
-            return mav;
-        }
-
-        return new ModelAndView("user/home");
+        ModelAndView mav = new ModelAndView("user/home");
+        mav.addObject("listPermission",
+                userService.getListPermission(SecurityUtils.getPrincipal().getUsername()));
+        return mav;
     }
 }

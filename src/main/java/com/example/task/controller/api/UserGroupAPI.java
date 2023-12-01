@@ -23,11 +23,12 @@ public class UserGroupAPI extends CommonAPI {
         responseService.setMessage("Insert success");
         try {
             userGroupService.save(userGroupDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 
     @PutMapping
@@ -35,11 +36,12 @@ public class UserGroupAPI extends CommonAPI {
         responseService.setMessage("Update success");
         try {
             userGroupService.update(userGroupDTO);
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 
     @DeleteMapping
@@ -47,10 +49,11 @@ public class UserGroupAPI extends CommonAPI {
         responseService.setMessage("Delete success");
         try {
             userGroupService.delete(userGroupDTO.getIds());
+            return ResponseEntity.ok(responseService);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok(responseService);
+
     }
 }

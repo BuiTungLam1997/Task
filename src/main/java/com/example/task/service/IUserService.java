@@ -1,5 +1,7 @@
 package com.example.task.service;
 
+import com.example.task.dto.GroupDTO;
+import com.example.task.dto.PermissionDTO;
 import com.example.task.dto.UserDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +15,7 @@ public interface IUserService extends IBaseService<UserDTO> {
 
     void delete(Long[] ids);
 
-    UserDTO findByUsername(String username);
+    Optional<UserDTO> findByUsername(String username);
 
     UserDTO save(UserDTO userDTO);
 
@@ -35,12 +37,11 @@ public interface IUserService extends IBaseService<UserDTO> {
 
     Page<UserDTO> querySearch(String search, Pageable pageable);
 
-
     void deleteUser(Long[] ids);
 
     List<String> findAllUsername();
 
-    List<String> getListPermission(String username);
+    List<GroupDTO> getListPermission(String username);
 
     List<UserDTO> findByFollow(Long taskId);
 }

@@ -1,30 +1,39 @@
 package com.example.task.service.impl;
 
-import com.example.task.dto.*;
-import com.example.task.dto.constant.*;
-import com.example.task.entity.*;
+import com.example.task.dto.GroupDTO;
+import com.example.task.dto.PermissionDTO;
+import com.example.task.dto.UserDTO;
+import com.example.task.dto.UserGroupDTO;
+import com.example.task.dto.constant.CodePermission;
+import com.example.task.dto.constant.LastNameEmail;
+import com.example.task.dto.constant.StatusUser;
+import com.example.task.entity.BaseEntity;
+import com.example.task.entity.GroupEntity;
+import com.example.task.entity.QUserEntity;
+import com.example.task.entity.UserEntity;
 import com.example.task.exception.NullPointException;
 import com.example.task.mail.SendEmailService;
-import com.example.task.repository.*;
+import com.example.task.repository.GroupRepository;
+import com.example.task.repository.UserGroupRepository;
+import com.example.task.repository.UserRepository;
 import com.example.task.repository.specifications.UserSearch;
-import com.example.task.service.*;
-import com.example.task.service.builderpattern.Filter.Filter;
-import com.example.task.service.builderpattern.Filter.FilterBuilder;
+import com.example.task.service.IGroupService;
+import com.example.task.service.IUserGroupService;
+import com.example.task.service.IUserService;
 import com.example.task.transformer.CommonTransformer;
+import com.example.task.transformer.GroupTransformer;
 import com.example.task.transformer.UserTransformer;
 import com.example.task.utils.StringUtils;
-import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +43,6 @@ import java.util.stream.Collectors;
 import static com.example.task.dto.constant.Roles.LOGIN;
 import static com.example.task.dto.constant.Roles.admin;
 import static com.example.task.dto.constant.StatusUser.INACTIVE;
-import static com.example.task.service.builderpattern.Filter.Filter.QueryOperator.LIKE;
 
 @Service
 public class UserService extends BaseService<UserDTO, UserEntity, UserRepository> implements IUserService {
@@ -54,16 +62,16 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     @Autowired
     private SendEmailService sendEmailService;
     @Autowired
-    private PermissionRepository permissionRepository;
-    @Autowired
     private UserTransformer userTransformer;
     @Autowired
     private UserSearch userSearch;
+    @Autowired
+    private GroupTransformer groupTransformer;
     private final QUserEntity QUser = QUserEntity.userEntity;
 
 
-    public UserService(UserRepository repo, CommonTransformer<UserDTO, UserEntity> transformer, EntityManager em) {
-        super(repo, transformer, em);
+    public UserService(UserRepository userRepository, CommonTransformer<UserDTO, UserEntity> transformer, EntityManager em) {
+        super(userRepository, transformer, em);
     }
 
     @Override
@@ -98,9 +106,8 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     }
 
     @Override
-    public UserDTO findByUsername(String username) {
-        JPAQuery<UserEntity> query = new JPAQuery<>(em);
-        return userTransformer.toDto(query.select(QUser).from(QUser).where(QUser.username.eq(username)).fetchFirst());
+    public Optional<UserDTO> findByUsername(String username) {
+        return Optional.ofNullable(transformer.opToDto(userRepository.findByUsername(username)));
     }
 
     @Override
@@ -138,11 +145,11 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     public UserDTO changePassword(UserDTO userDTO) {
         Optional<UserEntity> user = userRepository.findByUsername(userDTO.getUsername());
         if (!user.isPresent()) {
-            throw new RuntimeException();
+            throw new RuntimeException("Không tồn tại user");
         }
         UserEntity userEntity = user.get();
         if (passwordEncoder.matches(userDTO.getNewPassword(), userEntity.getPassword())) {
-            throw new RuntimeException();
+            throw new RuntimeException("Password sau khi thay đổi giống password cũ!");
         }
         userEntity.setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
         return transformer.toDto(userRepository.save(userEntity));
@@ -219,14 +226,8 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
 
     @Override
     public Page<UserDTO> querySearch(String search, Pageable pageable) {
-        Filter filter = new FilterBuilder()
-                .buildField(UserEntity.Fields.fullName)
-                .buildOperator(Filter.QueryOperator.LIKE)
-                .buildValue(search)
-                .build();
-        Specification<UserEntity> specification = userSearch.createSpecification(filter);
-        return userRepository.findAll(specification, pageable)
-                .map(userTransformer::toDto);
+        return userRepository.querySearch(search, pageable)
+                .map(transformer::toDto);
     }
 
     @Override
@@ -243,8 +244,11 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     }
 
     @Override
-    public List<String> getListPermission(String username) {
-        return userRepository.findAllPermissionByUsername(username);
+    public List<GroupDTO> getListPermission(String username) {
+        return userRepository.findAllPermissionByUsername(username)
+                .stream()
+                .map(groupTransformer::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

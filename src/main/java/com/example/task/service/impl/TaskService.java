@@ -1,32 +1,30 @@
 package com.example.task.service.impl;
 
+import com.example.task.dto.EmailDTO;
 import com.example.task.dto.TaskDTO;
 import com.example.task.dto.UserDTO;
 import com.example.task.entity.QTaskEntity;
 import com.example.task.entity.TaskEntity;
 import com.example.task.repository.TaskRepository;
 import com.example.task.repository.specifications.TaskSearch;
+import com.example.task.service.IEmailService;
 import com.example.task.service.ITaskService;
 import com.example.task.service.IUserService;
-import com.example.task.service.builderpattern.Filter.Filter;
-import com.example.task.service.builderpattern.Filter.FilterBuilder;
 import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.TaskTransformer;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.example.task.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.example.task.dto.constant.StatusTask.DONE;
-import static com.example.task.service.builderpattern.Filter.Filter.QueryOperator.LIKE;
+import static com.example.task.dto.constant.StatusSent.UNSENT;
 
 @Service
 public class TaskService extends BaseService<TaskDTO, TaskEntity, TaskRepository> implements ITaskService {
@@ -39,16 +37,16 @@ public class TaskService extends BaseService<TaskDTO, TaskEntity, TaskRepository
     private TaskSearch taskSearch;
     @Autowired
     private IUserService userService;
-    private QTaskEntity QTask = QTaskEntity.taskEntity;
+    @Autowired
+    private IEmailService emailService;
+    private final QTaskEntity QTask = QTaskEntity.taskEntity;
 
     public TaskService(TaskRepository repo, CommonTransformer<TaskDTO, TaskEntity> transformer, EntityManager em) {
         super(repo, transformer, em);
     }
 
-
     @Override
     public Page<TaskDTO> findAllByUsername(Pageable pageable, String username) {
-
         return taskRepository.findAllByPerformer(pageable, username).map(taskTransformer::toDto);
     }
 
@@ -76,38 +74,9 @@ public class TaskService extends BaseService<TaskDTO, TaskEntity, TaskRepository
     }
 
     @Override
-    public Page<TaskDTO> queryExample(Pageable pageable, String search) {
-        return taskRepository.findAll(buildFilter(search), pageable)
-                .map(taskTransformer::toDto);
-    }
-
-    private Specification<TaskEntity> buildFilter(String search) {
-        Filter filterTitle = new FilterBuilder()
-                .buildField(TaskEntity.Fields.title)
-                .buildOperator(LIKE)
-                .buildValue(search)
-                .build();
-        Filter filterPerformer = new FilterBuilder()
-                .buildField(TaskEntity.Fields.performer)
-                .buildOperator(LIKE)
-                .buildValue(search)
-                .build();
-        Filter filterStatus = new FilterBuilder()
-                .buildField(TaskEntity.Fields.status)
-                .buildOperator(LIKE)
-                .buildValue(search)
-                .build();
-        return taskSearch.createSpecification(filterTitle)
-                .or(taskSearch.createSpecification(filterPerformer))
-                .or(taskSearch.createSpecification(filterStatus));
-    }
-
-    @Override
-    public List<TaskDTO> searchTask(Pageable pageable, String search) {
-        return taskRepository.findAll(buildFilter(search), pageable)
-                .stream()
-                .map(item -> taskTransformer.toDto(item))
-                .collect(Collectors.toList());
+    public Page<TaskDTO> searchTask(Pageable pageable, String search) {
+        return taskRepository.searchTask(pageable, search)
+                .map(transformer::toDto);
     }
 
     @Override
@@ -126,8 +95,10 @@ public class TaskService extends BaseService<TaskDTO, TaskEntity, TaskRepository
     }
 
     @Override
-    public List<TaskDTO> findFollowByUserId(Long userId) {
-        return taskRepository.findFollowByUserId(userId)
+    public List<TaskDTO> findFollowByUserId() {
+        String username = SecurityUtils.getPrincipal().getUsername();
+        UserDTO user = userService.findByUsername(username).orElseThrow(NullPointerException::new);
+        return taskRepository.findFollowByUserId(user.getId())
                 .stream()
                 .map(transformer::toDto)
                 .collect(Collectors.toList());
@@ -135,16 +106,23 @@ public class TaskService extends BaseService<TaskDTO, TaskEntity, TaskRepository
 
     @Override
     public List<TaskDTO> findByPeriod(Long userId, int period) {
-        UserDTO user = userService.findById(userId).orElseThrow(NullPointerException::new);
-        JPAQuery<TaskDTO> query = new JPAQuery<>(em);
-        BooleanBuilder builder = new BooleanBuilder();
-        builder.and(QTask.deadlineEnd.before(LocalDate.now()).and(QTask.deadlineEnd.after(LocalDate.now()
-                .minusMonths(period))).and(QTask.performer.eq(user.getUsername())).and(QTask.status.eq(String.valueOf(DONE))));
-        return query.select(QTask).from(QTask).where(builder).fetch().stream().map(taskTransformer::toDto).collect(Collectors.toList());
+        return taskRepository.findByPeriod(userId, period).stream().map(transformer::toDto).collect(Collectors.toList());
     }
 
     @Override
     public int totalItemByPeriod(Long userId, int period) {
         return findByPeriod(userId, period).size();
+    }
+
+    @Override
+    public void saveEmail(TaskDTO taskDTO) {
+        Optional<UserDTO> userDTO = userService.findByUsername(taskDTO.getPerformer());
+        String to = userDTO.isPresent() ? userDTO.get().getEmail() : userService.getMailDefault();
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setToEmail(to);
+        emailDTO.setTitle(taskDTO.getTitle());
+        emailDTO.setContent(taskDTO.getContent());
+        emailDTO.setStatusSent(String.valueOf(UNSENT));
+        emailService.save(emailDTO);
     }
 }

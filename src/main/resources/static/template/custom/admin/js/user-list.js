@@ -1,7 +1,6 @@
 jQuery(function ($) {
     $(document).ready(function () {
 
-
         let init = async () => {
             let data = await getData("");
         }
@@ -63,65 +62,6 @@ jQuery(function ($) {
         $(".alert").delay(2000).slideUp(200, function () {
             $(this).alert('close');
         });
-
-        function fun() {
-            $('#search').val();
-            $('#btnSearch').submit();
-        }
-
-        function warningBeforeDelete() {
-            swal({
-                title: "Mài có chắc chắn xóa nó không ?",
-                text: "Thấy câu hỏi ở trên không ,ừ chỗ này giống nó đó ,trả lời đi!",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonClass: "btn-success",
-                cancelButtonClass: "btn-danger",
-                confirmButtonText: "Có, Con đồng ý xóa thưa ngài!",
-                cancelButtonText: "Không , Con cần thời gian suy nghĩ!",
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }).then(function (isConfirm) {
-                if (isConfirm) {
-                    var data = {};
-                    var dataArray = $('tbody input[type=checkbox]:checked').map(function () {
-                        return $(this).val();
-                    }).get();
-                    data['ids'] = dataArray;
-                    deleteUser(data);
-                }
-            });
-        }
-
-        function deleteUser(data) {
-            $.ajax({
-                url: '/api/permission',
-                type: 'DELETE',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (result) {
-                    window.location.href = '/admin-group-list?message=delete_success';
-                },
-                error: function (error) {
-                    window.location.href = '/admin-group-list?message=error_system';
-                },
-            });
-        }
-
-        function addGroup(data) {
-            $.ajax({
-                url: '/api/permission-group/create',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function (result) {
-                    window.location.href = '/admin-permission-list?message=insert_success';
-                },
-                error: function (error) {
-                    window.location.href = '/admin-permission-list?message=error_system';
-                },
-            });
-        }
 
         init();
     })

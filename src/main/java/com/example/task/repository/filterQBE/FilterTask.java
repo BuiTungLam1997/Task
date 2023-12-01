@@ -1,4 +1,4 @@
-package com.example.task.service.filterQBE;
+package com.example.task.repository.filterQBE;
 
 import com.example.task.dto.TaskDTO;
 import com.example.task.entity.TaskEntity;

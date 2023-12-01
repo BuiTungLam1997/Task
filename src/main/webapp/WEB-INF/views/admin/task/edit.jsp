@@ -68,7 +68,7 @@
                             </label>
 
                             <div class="col-sm-9">
-                                <form:input path="title" cssClass="col-xs-10 col-sm-5"/>
+                                <input type="text" id="title" name="title" value="" Class="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
                         <div class="space-4"></div>
@@ -78,7 +78,7 @@
                                 Content </label>
 
                             <div class="col-sm-9">
-                                <form:input path="content" cssClass="col-xs-10 col-sm-5"/>
+                                <input type="text" id="content" name="content" value="" Class="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
                         <div class="space-4"></div>
@@ -88,7 +88,7 @@
                                 Performer </label>
 
                             <div class="col-sm-9">
-                                <form:input path="performer" cssClass="col-xs-10 col-sm-5"/>
+                                <input type="text" id="performer" name="performer" value="" Class="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
 
@@ -96,7 +96,8 @@
                             <label class="col-sm-3 control-label no-padding-right" for="performer">
                                 Level of difficult : </label>
                             <div class="col-sm-9">
-                                <form:input path="levelOfDifficulty" readonly="true" cssClass="col-xs-10 col-sm-5"/>
+                                <input type="text" id="levelOfDifficulty" name="levelOfDifficulty" value=""
+                                       Class="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
 
@@ -105,7 +106,7 @@
                             </label>
 
                             <div class="col-sm-9">
-                                <form:input path="note" cssClass="col-xs-10 col-sm-5"/>
+                                <input type="text" id="note" name="note" value="" Class="col-xs-10 col-sm-5"/>
                             </div>
                         </div>
 
@@ -138,13 +139,13 @@
 
                         <div class="clearfix form-actions">
                             <div class="col-md-offset-3 col-md-9">
-                                <c:if test="${not empty model.id}">
+                                <c:if test="${not empty id}">
                                     <button class="btn btn-info" type="button" id="btnAddOrUpdateNew">
                                         <i class="ace-icon fa fa-check bigger-110"></i>
                                         Update
                                     </button>
                                 </c:if>
-                                <c:if test="${empty model.id}">
+                                <c:if test="${empty id}">
                                     <button class="btn btn-info" type="button" id="btnAddOrUpdateNew">
                                         <i class="ace-icon fa fa-check bigger-110"></i>
                                         Create
@@ -156,68 +157,14 @@
                             </div>
                         </div>
                         <div class="hr hr-24"></div>
-                        <form:hidden path="id" id="id"/>
+                        <input type="hidden" id="id" name="id" value="${id}"/>
                     </form:form>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.page-content -->
     </div>
 </div>
-<script>
-    $('#btnAddOrUpdateNew').click(function (e) {
-        e.preventDefault();
-        const formData = $('#formSubmit').serializeArray();
-        const data = {};
-        $.each(formData, function (i, v) {
-            data["" + v.name + ""] = v.value;
-        });
-        const id = $('#id').val();
-
-
-        if (id === "") {
-            create(data);
-        } else {
-            update(data);
-        }
-    });
-
-    function create(data) {
-        $.ajax({
-            url: '${TaskAPIURL}',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            dataType: 'json',
-            success: function (result) {
-                window.location.href = '${ListURL}&message=insert_success';
-            },
-            error: function (error) {
-                window.location.href = '${EditURL}?message=error_system';
-            },
-        });
-    }
-
-    $(".alert").delay(2000).slideUp(200, function () {
-        $(this).alert('close');
-    });
-
-    function update(data) {
-        $.ajax({
-            url: '${TaskAPIURL}',
-            type: 'PUT',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            dataType: 'json',
-            success: function (result) {
-                window.location.href = '${ListURL}&message=update_success';
-            },
-            error: function (error) {
-                window.location.href = '${ListURL}&message=error_system';
-            },
-        });
-    }
-
-</script>
+<script type='text/javascript' src="/template/custom/admin/js/task/task-edit.js"></script>
 </body>
 
 </html>

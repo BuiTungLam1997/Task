@@ -21,11 +21,10 @@ public class HomeController {
     @GetMapping(value = {"/admin-home"})
     public ModelAndView homePage() {
         String username = SecurityUtils.getPrincipal().getUsername();
-        UserDTO userDTO = userService.findByUsername(username);
+        Optional<UserDTO> userDTO = userService.findByUsername(username);
 
-        if (userDTO != null) {
-            UserDTO user = userDTO;
-            user.setListPermission(userService.getListPermission(username));
+        if (userDTO.isPresent()) {
+            UserDTO user = userDTO.get();
             ModelAndView mav = new ModelAndView("admin/home");
             mav.addObject("model", user);
             return mav;

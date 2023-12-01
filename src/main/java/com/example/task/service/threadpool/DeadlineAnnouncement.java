@@ -6,9 +6,11 @@ import com.example.task.dto.UserDTO;
 import com.example.task.service.impl.EmailService;
 import com.example.task.service.impl.TaskService;
 import com.example.task.service.impl.UserService;
+import org.springframework.expression.spel.ast.OpAnd;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,8 +38,10 @@ public class DeadlineAnnouncement {
         try {
             List<TaskDTO> ListTaskExpire = taskService.expire();
             for (TaskDTO task : ListTaskExpire) {
-                UserDTO user = userService.findByUsername(task.getPerformer());
-                //executorService.submit(addEmail(user, task));
+                Optional<UserDTO> user = userService.findByUsername(task.getPerformer());
+                if (user.isPresent()){
+                    //executorService.submit(addEmail(user, task));
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();

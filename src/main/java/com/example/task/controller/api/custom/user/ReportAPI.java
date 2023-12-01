@@ -32,10 +32,11 @@ public class ReportAPI extends CommonAPI {
             period = (period == null) ? 1 : period;
             task = taskService.findByPeriod(userId, period);
             totalPage = ((int) Math.ceil((double) taskService.totalItemByPeriod(userId, period) / limit));
+            return new ResponseEntity<>(new ResponseService(message, task, totalPage, page, limit, "200"), HttpStatus.OK);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseService(message, task, totalPage, page, limit, "200"), HttpStatus.OK);
+
     }
 }

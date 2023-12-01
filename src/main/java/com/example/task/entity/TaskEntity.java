@@ -1,6 +1,5 @@
 package com.example.task.entity;
 
-import com.example.task.dto.constant.Roles;
 import com.example.task.dto.constant.StatusTask;
 import lombok.Data;
 import lombok.experimental.FieldNameConstants;
@@ -13,7 +12,6 @@ import javax.persistence.EntityListeners;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "task")

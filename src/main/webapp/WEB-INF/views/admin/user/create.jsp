@@ -77,12 +77,10 @@
                         <div class="space-4"></div>
                         <div class="clearfix form-actions">
                             <div class="col-md-offset-3 col-md-9">
-                                <c:if test="${empty model.id}">
-                                    <button class="btn btn-info" type="button" id="btnAddOrUpdateNew">
-                                        <i class="ace-icon fa fa-check bigger-110"></i>
-                                        Create
-                                    </button>
-                                </c:if>
+                                <button class="btn btn-info" type="button" id="btnAdd">
+                                    <i class="ace-icon fa fa-check bigger-110"></i>
+                                    Create
+                                </button>
                             </div>
                         </div>
                         <div class="hr hr-24"></div>
@@ -93,39 +91,6 @@
         </div><!-- /.page-content -->
     </div>
 </div>
-<script>
-    $('#btnAddOrUpdateNew').click(function (e) {
-        e.preventDefault();
-        const formData = $('#formSubmit').serializeArray();
-        const data = {};
-        $.each(formData, function (i, v) {
-            data["" + v.name + ""] = v.value;
-        });
-        const id = $('#id').val();
-
-
-        if (id == "") {
-            create(data);
-        } else {
-            update(data);
-        }
-    });
-
-    function create(data) {
-        $.ajax({
-            url: '${UserAPIURL}',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            dataType: 'json',
-            success: function (result) {
-                window.location.href = "${UserURL}?id=" + result.id + "&message=insert_success";
-            },
-            error: function (error) {
-                window.location.href = '${ListURL}&message=error_system';
-            },
-        });
-    }
-</script>
+<script type='text/javascript' src="/template/custom/admin/js/user/create.js"></script>
 </body>
 </html>

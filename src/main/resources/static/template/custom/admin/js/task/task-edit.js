@@ -57,16 +57,16 @@ jQuery(function ($) {
 
         function create(data) {
             $.ajax({
-                url: '${TaskAPIURL}',
+                url: TaskAPIURL,
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 dataType: 'json',
                 success: function (result) {
-                    window.location.href = '${}&message=insert_success';
+                    window.location.href = ListURL + '&message=insert_success';
                 },
                 error: function (error) {
-                    window.location.href = '${EditURL}?message=error_system';
+                    window.location.href = EditURL + '?message=error_system';
                 },
             });
         }
@@ -77,16 +77,16 @@ jQuery(function ($) {
 
         function update(data) {
             $.ajax({
-                url: '${TaskAPIURL}',
+                url: TaskAPIURL,
                 type: 'PUT',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 dataType: 'json',
                 success: function (result) {
-                    window.location.href = '${ListURL}&message=update_success';
+                    window.location.href = ListURL + '&message=update_success';
                 },
                 error: function (error) {
-                    window.location.href = '${ListURL}&message=error_system';
+                    window.location.href = ListURL + '&message=error_system';
                 },
             });
         }
