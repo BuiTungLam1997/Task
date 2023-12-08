@@ -4,56 +4,55 @@ import com.example.task.dto.ResponseService;
 import com.example.task.dto.UserGroupDTO;
 import com.example.task.service.IUserGroupService;
 import lombok.AllArgsConstructor;
-import org.jboss.weld.context.http.Http;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import static com.example.task.dto.ResponseService.success;
 
 @RestController
 @RequestMapping(value = "api/user-group")
 @AllArgsConstructor
-public class UserGroupAPI extends CommonAPI {
+public class UserGroupAPI {
     private IUserGroupService userGroupService;
 
     @PostMapping
-    public ResponseEntity<ResponseService> createUserGroup(@RequestBody UserGroupDTO userGroupDTO) {
-        responseService.setMessage("Insert success");
+    public ResponseEntity<ResponseService<UserGroupDTO>> createUserGroup(@RequestBody UserGroupDTO userGroupDTO) {
+
         try {
             userGroupService.save(userGroupDTO);
-            return ResponseEntity.ok(responseService);
+            success();
         } catch (Exception ex) {
+            ResponseService<UserGroupDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-
+        return null;
     }
 
     @PutMapping
-    public ResponseEntity<ResponseService> updateUserGroup(@RequestBody UserGroupDTO userGroupDTO) {
-        responseService.setMessage("Update success");
+    public ResponseEntity<ResponseService<UserGroupDTO>> updateUserGroup(@RequestBody UserGroupDTO userGroupDTO) {
         try {
             userGroupService.update(userGroupDTO);
-            return ResponseEntity.ok(responseService);
+            success();
         } catch (Exception ex) {
+            ResponseService<UserGroupDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-
+        return null;
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseService> deleteUserGroup(@RequestBody UserGroupDTO userGroupDTO) {
-        responseService.setMessage("Delete success");
+    public ResponseEntity<ResponseService<UserGroupDTO>> deleteUserGroup(@RequestBody UserGroupDTO userGroupDTO) {
         try {
             userGroupService.delete(userGroupDTO.getIds());
-            return ResponseEntity.ok(responseService);
+            success();
         } catch (Exception ex) {
+            ResponseService<UserGroupDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-
+        return null;
     }
 }

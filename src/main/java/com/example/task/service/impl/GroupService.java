@@ -3,38 +3,43 @@ package com.example.task.service.impl;
 import com.example.task.dto.GroupDTO;
 import com.example.task.entity.GroupEntity;
 import com.example.task.repository.GroupRepository;
+import com.example.task.repository.UserGroupRepository;
 import com.example.task.service.IGroupService;
 import com.example.task.service.IUserGroupService;
 import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.GroupTransformer;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class GroupService extends BaseService<GroupDTO, GroupEntity, GroupRepository> implements IGroupService {
+@AllArgsConstructor
+public class GroupService implements IGroupService {
 
-    @Autowired
     private GroupRepository groupRepository;
-    @Autowired
-    private IUserGroupService userGroupService;
-    @Autowired
+
+    private UserGroupRepository userGroupRepository;
+
     private GroupTransformer groupTransformer;
 
-    public GroupService(GroupRepository repo, CommonTransformer<GroupDTO, GroupEntity> transformer, EntityManager em) {
-        super(repo, transformer, em);
-    }
 
     @Override
     public List<GroupDTO> findByUserId(Long userId) {
-        return userGroupService.findGroupId(userId).stream()
-                .map(item -> groupRepository.findById(item))
-                .map(item -> groupTransformer.opToDto(item))
+        return userGroupRepository.findByGroupId(userId).stream()
+                .map(groupRepository::findById)
+                .map(item -> item.orElse(null))
+                .filter(Objects::nonNull)
+                .map(groupTransformer::toDto)
                 .collect(Collectors.toList());
 
     }
@@ -50,10 +55,36 @@ public class GroupService extends BaseService<GroupDTO, GroupEntity, GroupReposi
     }
 
     @Override
+    @Transactional
     public void delete(Long[] ids) {
         for (Long item : ids) {
-            userGroupService.deleteByGroupId(item);
+            userGroupRepository.deleteByGroupId(item);
             groupRepository.deleteById(item);
         }
+    }
+
+    @Override
+    public List<GroupDTO> findAll() {
+        return groupRepository.findAll().stream()
+                .map(item -> groupTransformer.toDto(item))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GroupDTO> findAll(Pageable pageable) {
+        return groupRepository.findAll().stream()
+                .map(groupTransformer::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<GroupDTO> findById(Long id) {
+        return groupRepository.findById(id).map(groupTransformer::toDto);
+    }
+
+    @Override
+    public Page<GroupDTO> query(Pageable pageable) {
+        return groupRepository.findAll(pageable)
+                .map(item -> groupTransformer.toDto(item));
     }
 }

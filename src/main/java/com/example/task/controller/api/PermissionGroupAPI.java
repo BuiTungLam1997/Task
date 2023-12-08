@@ -13,59 +13,65 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.example.task.dto.ResponseService.success;
 import static com.example.task.dto.constant.Pageable.defaultLimit;
 import static com.example.task.dto.constant.Pageable.defaultPage;
 
 @RestController
 @RequestMapping(value = "/api/permission-group")
 @AllArgsConstructor
-public class PermissionGroupAPI extends CommonAPI {
+public class PermissionGroupAPI {
     private IPermissionGroupService permissionGroupService;
 
     @PostMapping(value = "/create")
-    public ResponseEntity<ResponseService> createPermissionGroup(@RequestBody PermissionGroupDTO permissionGroupDTO) {
+    public ResponseEntity<ResponseService<PermissionGroupDTO>> createPermissionGroup(@RequestBody PermissionGroupDTO permissionGroupDTO) {
         try {
             permissionGroupService.save(permissionGroupDTO);
-            return new ResponseEntity<>(new ResponseService("success", "200"), HttpStatus.OK);
+            success();
         } catch (Exception ex) {
+            ResponseService<PermissionGroupDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
+        return null;
     }
 
     @PutMapping
-    public ResponseEntity<ResponseService> updatePermissionGroup(@RequestBody PermissionGroupDTO permissionGroupDTO) {
+    public ResponseEntity<ResponseService<PermissionGroupDTO>> updatePermissionGroup(@RequestBody PermissionGroupDTO permissionGroupDTO) {
         try {
             permissionGroupService.update(permissionGroupDTO);
-            return new ResponseEntity<>(new ResponseService("sucscess", "200"), HttpStatus.OK);
+            success();
         } catch (Exception ex) {
+            ResponseService<PermissionGroupDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
+        return null;
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseService> deletePermissionGroup(@RequestBody PermissionGroupDTO permissionGroupDTO) {
+    public ResponseEntity<ResponseService<PermissionGroupDTO>> deletePermissionGroup(@RequestBody PermissionGroupDTO permissionGroupDTO) {
         try {
             permissionGroupService.delete(permissionGroupDTO);
-            return new ResponseEntity<>(new ResponseService("succses", "200"), HttpStatus.OK);
+            success();
         } catch (Exception ex) {
+            ResponseService<PermissionGroupDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
+        return null;
     }
 
     @PostMapping(path = "/list")
-    public ResponseEntity<ResponseService> listPermissionGroup(@RequestBody PermissionGroupDTO permissionGroupDTO,
-                                                               @RequestParam(required = false, defaultValue = "" + defaultPage + "") Integer page,
-                                                               @RequestParam(required = false, defaultValue = "" + defaultLimit + "") Integer limit) {
+    public ResponseEntity<ResponseService<List<PermissionGroupDTO>>> listPermissionGroup(
+            @RequestParam(required = false, defaultValue = "" + defaultPage + "") Integer page,
+            @RequestParam(required = false, defaultValue = "" + defaultLimit + "") Integer limit) {
         try {
             Pageable pageable = PageRequest.of(page - 1, limit);
-            Page<PermissionGroupDTO> listResult = permissionGroupService.query(pageable);
-            List<PermissionGroupDTO> listData = permissionGroupService.findAll(pageable);
-            int totalPage = listResult.getTotalPages();
-            return new ResponseEntity<>(new ResponseService(listData, totalPage, page), HttpStatus.OK);
+            Page<PermissionGroupDTO> listPermissions = permissionGroupService.query(pageable);
+            return new ResponseEntity<>(new ResponseService<>(listPermissions.getContent(), listPermissions.getTotalPages(), page), HttpStatus.OK);
         } catch (Exception ex) {
+            ResponseService<List<PermissionGroupDTO>> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }

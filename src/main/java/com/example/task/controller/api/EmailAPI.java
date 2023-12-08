@@ -3,40 +3,42 @@ package com.example.task.controller.api;
 import com.example.task.dto.EmailDTO;
 import com.example.task.dto.ResponseService;
 import com.example.task.service.IEmailService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.example.task.dto.ResponseService.success;
+
 @RestController
 @RequestMapping(value = "/api-email")
-public class EmailAPI extends CommonAPI {
-    @Autowired
+@AllArgsConstructor
+public class EmailAPI {
     private IEmailService emailService;
 
     @PostMapping
-    public ResponseEntity<ResponseService> createEmail(@RequestBody EmailDTO emailDTO) {
-        responseService.setMessage("Insert success");
+    public ResponseEntity<ResponseService<EmailDTO>> createEmail(@RequestBody EmailDTO emailDTO) {
         try {
             emailService.save(emailDTO);
-            return ResponseEntity.ok(responseService);
+            success();
         } catch (Exception ex) {
+            ResponseService<EmailDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-
+        return null;
     }
 
     @PutMapping
-    public ResponseEntity<ResponseService> updateEmail(@RequestBody EmailDTO emailDTO) {
-        responseService.setMessage("Update success");
+    public ResponseEntity<ResponseService<EmailDTO>> updateEmail(@RequestBody EmailDTO emailDTO) {
         try {
             emailService.update(emailDTO);
-            return ResponseEntity.ok(responseService);
+            success();
         } catch (Exception ex) {
+            ResponseService<EmailDTO> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-
+        return null;
     }
 }

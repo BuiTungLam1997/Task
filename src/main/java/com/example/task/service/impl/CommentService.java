@@ -1,34 +1,24 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.CommentDTO;
-import com.example.task.entity.CommentEntity;
 import com.example.task.repository.CommentRepository;
-import com.example.task.repository.UserRepository;
 import com.example.task.repository.projection.CommentProjection;
 import com.example.task.service.ICommentService;
 import com.example.task.transformer.CommentTransformer;
-import com.example.task.transformer.CommonTransformer;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class CommentService extends BaseService<CommentDTO, CommentEntity, CommentRepository> implements ICommentService {
-
-    @Autowired
+@AllArgsConstructor
+public class CommentService implements ICommentService {
     private CommentRepository commentRepository;
-
-    @Autowired
     private CommentTransformer commentTransformer;
-
-    public CommentService(CommentRepository repo, CommonTransformer<CommentDTO, CommentEntity> transformer, EntityManager em) {
-        super(repo, transformer, em);
-    }
 
     @Override
     public CommentDTO save(CommentDTO commentDTO) {
@@ -66,5 +56,30 @@ public class CommentService extends BaseService<CommentDTO, CommentEntity, Comme
                 .map(CommentProjection::toEntity)
                 .map(commentTransformer::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentDTO> findAll() {
+        return commentRepository.findAll().stream()
+                .map(item -> commentTransformer.toDto(item))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentDTO> findAll(Pageable pageable) {
+        return commentRepository.findAll().stream()
+                .map(commentTransformer::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<CommentDTO> findById(Long id) {
+        return commentRepository.findById(id).map(commentTransformer::toDto);
+    }
+
+    @Override
+    public Page<CommentDTO> query(Pageable pageable) {
+        return commentRepository.findAll(pageable)
+                .map(item -> commentTransformer.toDto(item));
     }
 }

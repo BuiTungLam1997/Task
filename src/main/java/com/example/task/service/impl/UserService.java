@@ -1,7 +1,6 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.GroupDTO;
-import com.example.task.dto.PermissionDTO;
 import com.example.task.dto.UserDTO;
 import com.example.task.dto.UserGroupDTO;
 import com.example.task.dto.constant.CodePermission;
@@ -9,70 +8,53 @@ import com.example.task.dto.constant.LastNameEmail;
 import com.example.task.dto.constant.StatusUser;
 import com.example.task.entity.BaseEntity;
 import com.example.task.entity.GroupEntity;
-import com.example.task.entity.QUserEntity;
 import com.example.task.entity.UserEntity;
 import com.example.task.exception.NullPointException;
 import com.example.task.mail.SendEmailService;
 import com.example.task.repository.GroupRepository;
 import com.example.task.repository.UserGroupRepository;
 import com.example.task.repository.UserRepository;
-import com.example.task.repository.specifications.UserSearch;
-import com.example.task.service.IGroupService;
-import com.example.task.service.IUserGroupService;
 import com.example.task.service.IUserService;
-import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.GroupTransformer;
+import com.example.task.transformer.UserGroupTransformer;
 import com.example.task.transformer.UserTransformer;
 import com.example.task.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.task.dto.constant.Roles.LOGIN;
-import static com.example.task.dto.constant.Roles.admin;
 import static com.example.task.dto.constant.StatusUser.INACTIVE;
 
 @Service
-public class UserService extends BaseService<UserDTO, UserEntity, UserRepository> implements IUserService {
+@AllArgsConstructor
+public class UserService implements IUserService {
 
-    @Autowired
+
     private UserRepository userRepository;
-    @Autowired
-    private UserGroupRepository userGroupRepository;
-    @Autowired
-    private IGroupService groupService;
-    @Autowired
+
     private GroupRepository groupRepository;
-    @Autowired
+
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private IUserGroupService userGroupService;
-    @Autowired
+
+    private UserGroupRepository userGroupRepository;
+
     private SendEmailService sendEmailService;
-    @Autowired
+
     private UserTransformer userTransformer;
-    @Autowired
-    private UserSearch userSearch;
-    @Autowired
+
     private GroupTransformer groupTransformer;
-    private final QUserEntity QUser = QUserEntity.userEntity;
 
+    private UserGroupTransformer userGroupTransformer;
 
-    public UserService(UserRepository userRepository, CommonTransformer<UserDTO, UserEntity> transformer, EntityManager em) {
-        super(userRepository, transformer, em);
-    }
 
     @Override
     public List<GrantedAuthority> findByListAuthorities(String username) {
@@ -80,9 +62,10 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
         if (userEntity.isPresent()) {
             List<GrantedAuthority> authorities = new ArrayList<>();
             try {
-                List<GroupDTO> groupDTOS = groupService.findByUserId(userEntity.get().getId());
-                for (GroupDTO item : groupDTOS) {
-                    authorities.add(new SimpleGrantedAuthority(item.getCode()));
+                List<Long> groupIds = userGroupRepository.findByUserId(userEntity.get().getId());
+                for (Long item : groupIds) {
+                    GroupDTO groupDTO = groupRepository.findById(item).map(groupTransformer::toDto).orElseThrow(NullPointerException::new);
+                    authorities.add(new SimpleGrantedAuthority(groupDTO.getCode()));
                 }
                 return authorities;
             } catch (Exception ex) {
@@ -93,9 +76,10 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     }
 
     @Override
+    @Transactional
     public void delete(Long[] ids) {
+        userGroupRepository.deleteAllById(Arrays.asList(ids));
         for (Long item : ids) {
-            userGroupService.deleteByUserId(item);
             Optional<UserDTO> userDTO = findById(item);
             if (userDTO.isPresent()) {
                 UserDTO user = userDTO.get();
@@ -107,7 +91,7 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
 
     @Override
     public Optional<UserDTO> findByUsername(String username) {
-        return Optional.ofNullable(transformer.opToDto(userRepository.findByUsername(username)));
+        return Optional.ofNullable(userTransformer.opToDto(userRepository.findByUsername(username)));
     }
 
     @Override
@@ -115,9 +99,9 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
         userDTO.setUsername(createUsername(userDTO.getFullName()));
         userDTO.setEmail(createEmail(userDTO.getUsername()));
 
-        UserEntity user = transformer.toEntity(userDTO);
+        UserEntity user = userTransformer.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        userDTO = transformer.toDto(user);
+        userDTO = userTransformer.toDto(user);
         addGroup(userDTO);
 
         return userDTO;
@@ -127,7 +111,7 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
         UserGroupDTO userGroupDTO = new UserGroupDTO();
         userGroupDTO.setUserId(userDTO.getId());
         userGroupDTO.setGroupId(getGroupIdByRole(String.valueOf(LOGIN)));
-        userGroupService.save(userGroupDTO);
+        userGroupRepository.save(userGroupTransformer.toEntity(userGroupDTO));
     }
 
     private Long getGroupIdByRole(String role) {
@@ -152,7 +136,7 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
             throw new RuntimeException("Password sau khi thay đổi giống password cũ!");
         }
         userEntity.setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
-        return transformer.toDto(userRepository.save(userEntity));
+        return userTransformer.toDto(userRepository.save(userEntity));
     }
 
     @Override
@@ -184,18 +168,26 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     }
 
     @Override
-    public String getMailDefault() {
-        return userRepository.findByUsername(String.valueOf(admin)).map(UserEntity::getEmail).orElseThrow(NullPointerException::new);
+    public List<UserDTO> findAll() {
+        return userRepository.findAll().stream()
+                .map(item -> userTransformer.toDto(item))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<UserDTO> findById(Long id) {
+        return userRepository.findById(id).map(userTransformer::toDto);
+    }
+
+    @Override
+    public Page<UserDTO> query(Pageable pageable) {
+        return userRepository.findAll(pageable)
+                .map(userTransformer::toDto);
     }
 
     private List<UserDTO> findByRole(String role) {
         Optional<GroupEntity> group = groupRepository.findByCode(role);
         List<Long> userGroupEntities = userGroupRepository.findByGroupId(group.map(BaseEntity::getId).orElseThrow(NullPointException::new));
-
-        if (userGroupEntities.isEmpty()) {
-            return Collections.emptyList();
-        }
-
         return userGroupEntities.stream()
                 .map(item -> userRepository.findById(item))
                 .map(item -> userTransformer.opToDto(item))
@@ -204,8 +196,8 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
 
     private String createUsername(String fullName) {
         StringBuilder username = new StringBuilder();
-        String firstUser = "";
-        String lastUser = "";
+        String firstUser;
+        String lastUser;
         String[] split = fullName.split("\\s");
 
         lastUser = StringUtils.removeAccent(split[0]);
@@ -227,7 +219,7 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     @Override
     public Page<UserDTO> querySearch(String search, Pageable pageable) {
         return userRepository.querySearch(search, pageable)
-                .map(transformer::toDto);
+                .map(userTransformer::toDto);
     }
 
     @Override
@@ -255,7 +247,7 @@ public class UserService extends BaseService<UserDTO, UserEntity, UserRepository
     public List<UserDTO> findByFollow(Long taskId) {
         return userRepository.findByFollowTask(taskId)
                 .stream()
-                .map(transformer::toDto)
+                .map(userTransformer::toDto)
                 .collect(Collectors.toList());
     }
 }

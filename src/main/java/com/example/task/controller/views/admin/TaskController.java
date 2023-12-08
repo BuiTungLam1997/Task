@@ -27,7 +27,7 @@ import static com.example.task.dto.constant.Pageable.defaultLimit;
 import static com.example.task.dto.constant.Pageable.defaultPage;
 import static com.example.task.dto.constant.StatusMessage.*;
 import static com.example.task.dto.constant.StatusSent.UNSENT;
-import static com.example.task.dto.constant.SystemConstant.model;
+import static com.example.task.service.impl.EmailService.getMailDefault;
 
 @Controller
 @AllArgsConstructor
@@ -112,7 +112,7 @@ public class TaskController {
 
     private void saveEmail(TaskDTO taskDTO) {
         Optional<UserDTO> userDTO = userService.findByUsername(taskDTO.getPerformer());
-        String to = userDTO.isPresent() ? userDTO.get().getEmail() : userService.getMailDefault();
+        String to = userDTO.isPresent() ? userDTO.get().getEmail() : getMailDefault();
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setToEmail(to);
         emailDTO.setTitle(taskDTO.getTitle());

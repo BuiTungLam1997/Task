@@ -14,19 +14,17 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class UserGroupService extends BaseService<UserGroupDTO, UserGroupEntity,UserGroupRepository> implements IUserGroupService {
+@AllArgsConstructor
+public class UserGroupService implements IUserGroupService {
 
-    @Autowired
+
     private UserGroupRepository userGroupRepository;
-    @Autowired
-    private UserGroupTransformer userGroupTransformer;
 
-    public UserGroupService(UserGroupRepository repo, CommonTransformer<UserGroupDTO, UserGroupEntity> transformer, EntityManager em) {
-        super(repo, transformer, em);
-    }
+    private UserGroupTransformer userGroupTransformer;
 
 
     @Override
@@ -83,5 +81,29 @@ public class UserGroupService extends BaseService<UserGroupDTO, UserGroupEntity,
         return userGroupRepository.findAllByGroupId(groupId).stream()
                 .map(userGroupTransformer::toDto)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public List<UserGroupDTO> findAll() {
+        return userGroupRepository.findAll().stream()
+                .map(item -> userGroupTransformer.toDto(item))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserGroupDTO> findAll(Pageable pageable) {
+        return userGroupRepository.findAll().stream()
+                .map(userGroupTransformer::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<UserGroupDTO> findById(Long id) {
+        return userGroupRepository.findById(id).map(userGroupTransformer::toDto);
+    }
+
+    @Override
+    public Page<UserGroupDTO> query(Pageable pageable) {
+        return userGroupRepository.findAll(pageable)
+                .map(item -> userGroupTransformer.toDto(item));
     }
 }

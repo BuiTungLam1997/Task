@@ -1,4 +1,4 @@
-package com.example.task.service.threadpool;
+package com.example.task.service;
 
 import com.example.task.dto.EmailDTO;
 import com.example.task.dto.TaskDTO;

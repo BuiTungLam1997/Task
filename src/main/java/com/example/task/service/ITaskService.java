@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-public interface ITaskService extends IBaseService<TaskDTO> {
+public interface ITaskService {
 
     Page<TaskDTO> findAllByUsername(Pageable pageable, String username);
 
@@ -27,7 +27,15 @@ public interface ITaskService extends IBaseService<TaskDTO> {
 
     List<TaskDTO> findFollowByUserId();
 
-    List<TaskDTO> findByPeriod(Long userId,int period);
+    Page<TaskDTO> findByPeriod(Long userId,int period);
     int totalItemByPeriod(Long userId,int period);
     void saveEmail(TaskDTO taskDTO);
+    void setEmail(TaskDTO taskOld, TaskDTO taskDTO);
+    List<TaskDTO> findAll();
+
+    List<TaskDTO> findAll(Pageable pageable);
+
+    Optional<TaskDTO> findById(Long id);
+
+    Page<TaskDTO> query(Pageable pageable);
 }

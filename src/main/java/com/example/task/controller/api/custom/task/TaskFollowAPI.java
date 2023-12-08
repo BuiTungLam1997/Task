@@ -1,6 +1,5 @@
 package com.example.task.controller.api.custom.task;
 
-import com.example.task.controller.api.CommonAPI;
 import com.example.task.dto.FollowDTO;
 import com.example.task.dto.ResponseService;
 import com.example.task.dto.TaskDTO;
@@ -11,25 +10,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
+
+import static com.example.task.dto.ResponseService.success;
 
 @RestController
 @RequestMapping(value = "/api/task-follow")
 @AllArgsConstructor
-public class TaskFollowAPI extends CommonAPI {
+public class TaskFollowAPI {
 
     private IFollowService followService;
     private ITaskService taskService;
 
     @GetMapping(value = "/list")
-    public ResponseEntity<ResponseService> listTaskFollow() {
-        responseService.setMessage("Success");
-        List<TaskDTO> data;
+    public ResponseEntity<ResponseService<List<TaskDTO>>> listTaskFollow() {
         try {
-            data = taskService.findFollowByUserId();
-            return new ResponseEntity<>(new ResponseService(data, "200"), HttpStatus.OK);
+            List<TaskDTO> data = taskService.findFollowByUserId();
+            return new ResponseEntity<>(new ResponseService<>(data, "200"), HttpStatus.OK);
         } catch (Exception ex) {
+            ResponseService<List<TaskDTO>> responseService = new ResponseService<>();
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
@@ -37,24 +36,23 @@ public class TaskFollowAPI extends CommonAPI {
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<ResponseService> createFollowTask(@RequestBody FollowDTO followDTO) {
-        responseService.setMessage("Success");
+    public ResponseEntity<ResponseService<TaskDTO>> createFollowTask(@RequestBody FollowDTO followDTO) {
+        ResponseService<TaskDTO> responseService = new ResponseService<>();
         try {
             followService.save(followDTO);
-            return ResponseEntity.ok(responseService);
+            success();
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
-            return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
         }
-
+        return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping(value = "/delete")
-    public ResponseEntity<ResponseService> deleteFollow(@RequestBody FollowDTO followDTO) {
-        responseService.setMessage("Success");
+    public ResponseEntity<ResponseService<TaskDTO>> deleteFollow(@RequestBody FollowDTO followDTO) {
+        ResponseService<TaskDTO> responseService = new ResponseService<>();
         try {
             followService.delete(followDTO.getTaskIds());
-            return new ResponseEntity<>(new ResponseService("Success", "200"), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseService<>("Success", "200"), HttpStatus.OK);
         } catch (Exception ex) {
             responseService.setMessage(ex.getMessage());
             return new ResponseEntity<>(responseService, HttpStatus.BAD_REQUEST);

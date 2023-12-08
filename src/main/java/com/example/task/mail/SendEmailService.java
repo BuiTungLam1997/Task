@@ -1,13 +1,13 @@
 package com.example.task.mail;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class SendEmailService {
-    @Autowired
     private MailSender mailSender;
 
     public void sendMail(String to, String title, String content) {

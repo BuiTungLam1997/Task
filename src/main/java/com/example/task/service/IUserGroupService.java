@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IUserGroupService {
     List<Long> findGroupId(Long userId);
@@ -22,4 +23,11 @@ public interface IUserGroupService {
     void deleteByGroupId(Long groupId);
 
     void save(Long groupId, Long[] userId);
+    List<UserGroupDTO> findAll();
+
+    List<UserGroupDTO> findAll(Pageable pageable);
+
+    Optional<UserGroupDTO> findById(Long id);
+
+    Page<UserGroupDTO> query(Pageable pageable);
 }

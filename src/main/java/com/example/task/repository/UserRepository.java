@@ -30,10 +30,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
     @Query("select username from UserEntity")
     List<String> findAllUsername();
 
-//    @Query(value = "select distinct(gp.code) from user u inner join user_group ug inner join group_ gp " +
-//            " on u.id = ug.user_id and ug.group_id = gp.id where u.username = ?1"
-//            , nativeQuery = true)
-//    List<String> findAllPermissionByUsername(String username);
 
     @Query(value = "select u from UserEntity u inner join FollowEntity f on f.userId = u.id where f.taskId=?1")
     List<UserEntity> findByFollowTask(Long taskId);
