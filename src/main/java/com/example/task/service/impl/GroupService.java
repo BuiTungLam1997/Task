@@ -1,22 +1,16 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.GroupDTO;
-import com.example.task.entity.GroupEntity;
 import com.example.task.repository.GroupRepository;
 import com.example.task.repository.UserGroupRepository;
 import com.example.task.service.IGroupService;
-import com.example.task.service.IUserGroupService;
-import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.GroupTransformer;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;

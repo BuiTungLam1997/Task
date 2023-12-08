@@ -1,23 +1,16 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.PermissionDTO;
-import com.example.task.dto.PermissionGroupDTO;
-import com.example.task.entity.PermissionEntity;
-import com.example.task.entity.PermissionGroupEntity;
 import com.example.task.repository.PermissionGroupRepository;
 import com.example.task.repository.PermissionRepository;
 import com.example.task.service.IPermissionService;
-import com.example.task.service.IUserGroupService;
-import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.PermissionTransformer;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

@@ -1,22 +1,17 @@
 package com.example.task.service.impl;
 
 import com.example.task.dto.FollowDTO;
-import com.example.task.entity.FollowEntity;
 import com.example.task.repository.FollowRepository;
 import com.example.task.repository.UserRepository;
 import com.example.task.service.IFollowService;
-import com.example.task.service.IUserService;
-import com.example.task.transformer.CommonTransformer;
 import com.example.task.transformer.FollowTransformer;
 import com.example.task.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;

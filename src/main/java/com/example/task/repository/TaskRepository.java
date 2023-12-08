@@ -23,8 +23,6 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<TaskEntity, Long>, JpaSpecificationExecutor<TaskEntity>, ITaskRepository {
     TaskSearch taskSearch = new TaskSearch();
 
-    List<TaskEntity> findAllByPerformer(String performer);
-
     Page<TaskEntity> findAllByPerformer(Pageable pageable, String performer);
 
     Integer countByPerformer(String performer);
