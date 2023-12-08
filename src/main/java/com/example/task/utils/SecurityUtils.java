@@ -1,6 +1,6 @@
 package com.example.task.utils;
 
-import com.example.task.dto.MyUser;
+import com.example.task.security.MyUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -8,17 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SecurityUtils {
-    public static MyUser getPrincipal() {
-        MyUser myUser = (MyUser) (SecurityContextHolder.getContext()).getAuthentication().getPrincipal();
-        return myUser;
+    public static MyUser getPrincipal(){
+        return (MyUser) (SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
-
     public static List<String> getAuthorities() {
-        List<String> results = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         List<GrantedAuthority> authorities = (List<GrantedAuthority>) (SecurityContextHolder.getContext().getAuthentication().getAuthorities());
         for (GrantedAuthority authority : authorities) {
-            results.add(authority.getAuthority());
+            result.add(authority.getAuthority());
         }
-        return results;
+        return result;
     }
 }

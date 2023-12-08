@@ -5,13 +5,13 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "grouppermission")
-public class GroupEntity extends BaseEntity{
-    @Column(name = "name")
+@Table(name = "group_")
+public class GroupEntity extends BaseEntity {
+    @Column()
     private String name;
-    @Column(name = "code")
+    @Column()
     private String code;
-    @Column(name = "note")
+    @Column()
     private String note;
 
     public String getName() {

@@ -7,7 +7,7 @@
 --%>
 <%@include file="/common/taglib.jsp" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Đăng nhâp</title>
 </head>
@@ -15,12 +15,22 @@
 <div class="container">
     <c:if test="${param.incorrectAccount != null}">
         <div class="alert alert-danger" role="alert" id="alert">
-                Username or password incorrect !
+            Username or password incorrect !
         </div>
     </c:if>
     <c:if test="${param.accessDenied != null}">
         <div class="alert alert-danger" role="alert" id="alert">
             You Not authorize!
+        </div>
+    </c:if>
+    <c:if test="${param.sessionTimeout != null}">
+        <div class="alert alert-danger" role="alert" id="alert">
+            Session Timeout!
+        </div>
+    </c:if>
+    <c:if test="${not empty message}">
+        <div class="alert alert-danger" role="alert" id="alert">
+           ${message}
         </div>
     </c:if>
     <div class="d-flex justify-content-center h-100">
@@ -33,34 +43,30 @@
                     <span><i class="fab fa-twitter-square"></i></span>
                 </div>
             </div>
-            <form action="/j_spring_security_check" id="formLogin" method="POST">
-                <div class="card-body">
-                    <form>
-                        <div class="input-group form-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            </div>
-                            <input type="text" class="form-control" id="userName" name="j_username"
-                                   placeholder="username">
-
+            <div class="card-body">
+                <form action="/process-login" method="post">
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
                         </div>
-                        <div class="input-group form-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-key"></i></span>
-                            </div>
-                            <input type="password" class="form-control" id="password" name="j_password"
-                                   placeholder="password">
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="username"/>
+                    </div>
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
                         </div>
-                        <div class="row align-items-center remember">
-                            <input type="checkbox">Remember Me
-                        </div>
-                        <input type="hidden" value="login" id="action" name="action">
-                        <div class="form-group">
-                            <button type="submit" value="Login" class="btn float-right login_btn">Đăng nhập</button>
-                        </div>
-                    </form>
-                </div>
-            </form>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="password"/>
+                    </div>
+                    <div class="row align-items-center remember">
+                        <input type="checkbox">Remember Me
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn float-right login_btn">Đăng nhập</button>
+                    </div>
+                </form>
+            </div>
             <div class="card-footer">
                 <div class="d-flex justify-content-center links">
                     Don't have an account?<a href="#">Sign Up</a>
