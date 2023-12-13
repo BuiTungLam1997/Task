@@ -1,7 +1,7 @@
 package com.example.task.repository;
 
 import com.example.task.entity.UserEntity;
-import com.example.task.repository.customRepository.IUserRepository;
+import com.example.task.customrepository.IUserRepository;
 import com.example.task.repository.specifications.UserSearch;
 import com.example.task.service.builderpattern.Filter.Filter;
 import com.example.task.service.builderpattern.Filter.FilterBuilder;
@@ -23,10 +23,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
     Optional<UserEntity> findByUsername(String username);
 
     int countByUsernameStartsWith(String username);
-
-    @Query("select username from UserEntity")
-    List<String> findAllUsername();
-
 
     @Query(value = "select u from UserEntity u inner join FollowEntity f on f.userId = u.id where f.taskId=?1")
     List<UserEntity> findByFollowTask(Long taskId);

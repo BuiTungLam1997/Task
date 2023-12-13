@@ -4,6 +4,7 @@ import com.example.task.dto.BaseDTO;
 import com.example.task.entity.BaseEntity;
 import org.modelmapper.ModelMapper;
 
+import java.util.Collections;
 import java.util.Optional;
 
 public abstract class CommonTransformer<T extends BaseDTO<T>, E extends BaseEntity> implements ITransformer<T, E> {
@@ -29,11 +30,17 @@ public abstract class CommonTransformer<T extends BaseDTO<T>, E extends BaseEnti
 
     @Override
     public T opToDto(Optional<E> e) {
-        return modelMapper.map(e, tClass);
+        if (e.isPresent()) {
+            return modelMapper.map(e, tClass);
+        }
+        return null;
     }
 
     @Override
     public E opToEntity(Optional<T> t) {
-        return modelMapper.map(t, eClass);
+        if (t.isPresent()) {
+            return modelMapper.map(t, eClass);
+        }
+        return null;
     }
 }

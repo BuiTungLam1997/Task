@@ -2,6 +2,8 @@ package com.example.task.service;
 
 import com.example.task.dto.GroupDTO;
 import com.example.task.dto.UserDTO;
+import com.example.task.dto.constant.StatusUser;
+import com.example.task.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -47,4 +49,5 @@ public interface IUserService {
     Optional<UserDTO> findById(Long id);
 
     Page<UserDTO> query(Pageable pageable);
+    Optional<UserEntity> findByUsernameAndStatus (String username,String status);
 }

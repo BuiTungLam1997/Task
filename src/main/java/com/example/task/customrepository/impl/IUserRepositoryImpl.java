@@ -1,15 +1,10 @@
-package com.example.task.repository.Impl;
+package com.example.task.customrepository.impl;
 
-import com.example.task.dto.GroupDTO;
-import com.example.task.dto.PermissionDTO;
 import com.example.task.entity.*;
-import com.example.task.repository.customRepository.IUserRepository;
+import com.example.task.customrepository.IUserRepository;
 import com.example.task.repository.specifications.UserSearch;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -18,21 +13,12 @@ import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
-public class UserRepositoryImpl implements IUserRepository {
+public class IUserRepositoryImpl implements IUserRepository {
     private final QUserEntity qUserEntity = QUserEntity.userEntity;
     private final QUserGroupEntity qUserGroupEntity = QUserGroupEntity.userGroupEntity;
     private final QGroupEntity qGroupEntity = QGroupEntity.groupEntity;
 
     private EntityManager em;
-    private UserSearch userSearch;
-
-    @Override
-    public Optional<UserEntity> findByUsername(String username) {
-        JPAQuery<UserEntity> query = new JPAQuery<>(em);
-        UserEntity user = query.select(qUserEntity).from(qUserEntity).where(qUserEntity.username.eq(username)).fetchFirst();
-        if (user == null) return Optional.empty();
-        return Optional.of(user);
-    }
 
     @Override
     public List<String> findAllUsername() {
@@ -43,7 +29,7 @@ public class UserRepositoryImpl implements IUserRepository {
     @Override
     public List<GroupEntity> findAllPermissionByUsername(String username) {
         JPAQuery<GroupEntity> query = new JPAQuery<>(em);
-        List<GroupEntity> list = query.select(qGroupEntity)
+        return query.select(qGroupEntity)
                 .distinct()
                 .from(qGroupEntity)
                 .innerJoin(qUserGroupEntity)
@@ -52,6 +38,5 @@ public class UserRepositoryImpl implements IUserRepository {
                 .on(qUserEntity.id.eq(qUserGroupEntity.userId))
                 .where(qUserEntity.username.eq(username))
                 .fetch();
-        return list;
     }
 }

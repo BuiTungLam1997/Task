@@ -21,15 +21,12 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CustomUserDetailService implements UserDetailsService {
 
-
-    private UserRepository userRepository;
-
     private IUserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            Optional<UserEntity> userEntity = userRepository.findByUsernameAndStatus(username, String.valueOf(StatusUser.ACTIVE));
+            Optional<UserEntity> userEntity = userService.findByUsernameAndStatus(username, String.valueOf(StatusUser.ACTIVE));
             if (userEntity.isPresent()) {
                 List<GrantedAuthority> authorities = userService.findByListAuthorities(username);
                 UserEntity user = userEntity.get();

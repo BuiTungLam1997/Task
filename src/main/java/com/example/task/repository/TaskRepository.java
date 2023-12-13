@@ -1,12 +1,9 @@
 package com.example.task.repository;
-
-import com.example.task.dto.TaskDTO;
 import com.example.task.entity.TaskEntity;
-import com.example.task.repository.customRepository.ITaskRepository;
+import com.example.task.customrepository.ITaskRepository;
 import com.example.task.repository.specifications.TaskSearch;
 import com.example.task.service.builderpattern.Filter.Filter;
 import com.example.task.service.builderpattern.Filter.FilterBuilder;
-import lombok.Data;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +13,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
-@Primary
 public interface TaskRepository extends JpaRepository<TaskEntity, Long>, JpaSpecificationExecutor<TaskEntity>, ITaskRepository {
     TaskSearch taskSearch = new TaskSearch();
 

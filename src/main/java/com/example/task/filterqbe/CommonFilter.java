@@ -1,4 +1,4 @@
-package com.example.task.repository.filterQBE;
+package com.example.task.filterqbe;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Example;

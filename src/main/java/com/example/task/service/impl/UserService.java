@@ -38,7 +38,6 @@ import static com.example.task.dto.constant.StatusUser.INACTIVE;
 @AllArgsConstructor
 public class UserService implements IUserService {
 
-
     private UserRepository userRepository;
 
     private GroupRepository groupRepository;
@@ -80,12 +79,9 @@ public class UserService implements IUserService {
     public void delete(Long[] ids) {
         userGroupRepository.deleteAllById(Arrays.asList(ids));
         for (Long item : ids) {
-            Optional<UserDTO> userDTO = findById(item);
-            if (userDTO.isPresent()) {
-                UserDTO user = userDTO.get();
-                userDTO.get().setStatus(INACTIVE);
-                update(user);
-            }
+            Optional<UserEntity> user = userRepository.findById(item);
+            user.ifPresent(userEntity -> userEntity.setStatus(String.valueOf(INACTIVE)));
+            user.map(userEntity -> userRepository.save(userEntity));
         }
     }
 
@@ -223,10 +219,12 @@ public class UserService implements IUserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long[] ids) {
         for (Long item : ids) {
             Optional<UserEntity> user = userRepository.findById(item);
             user.ifPresent(userEntity -> userEntity.setStatus(String.valueOf(INACTIVE)));
+            user.map(userEntity -> userRepository.save(userEntity));
         }
     }
 
@@ -249,5 +247,10 @@ public class UserService implements IUserService {
                 .stream()
                 .map(userTransformer::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<UserEntity> findByUsernameAndStatus(String username, String status) {
+        return userRepository.findByUsernameAndStatus(username, status);
     }
 }
